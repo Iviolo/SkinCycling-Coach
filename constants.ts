@@ -93,7 +93,7 @@ export const DEFAULT_ROUTINE_SETTINGS: RoutineSettings = {
       dayNumber: 1,
       title: 'Esfoliazione',
       description: 'Rimuove le cellule morte e libera i pori.',
-      colorTheme: 'emerald',
+      colorTheme: 'orange',
       isEnabled: true,
       steps: [
         { id: 'n1_1', label: 'Pulizia', productName: 'Hydro Boost Aqua Gel' },
@@ -106,7 +106,7 @@ export const DEFAULT_ROUTINE_SETTINGS: RoutineSettings = {
       dayNumber: 2,
       title: 'Retinoide',
       description: 'Stimola il turn-over cellulare e il collagene.',
-      colorTheme: 'purple',
+      colorTheme: 'pink',
       isEnabled: true,
       steps: [
         { id: 'n2_1', label: 'Pulizia', productName: 'Hydro Boost Aqua Gel' },
@@ -119,7 +119,7 @@ export const DEFAULT_ROUTINE_SETTINGS: RoutineSettings = {
       dayNumber: 3,
       title: 'Recupero',
       description: 'Idratazione profonda e riparazione barriera.',
-      colorTheme: 'sky',
+      colorTheme: 'green',
       isEnabled: true,
       steps: [
         { id: 'n3_1', label: 'Pulizia', productName: 'Hydro Boost Aqua Gel' },
@@ -133,7 +133,7 @@ export const DEFAULT_ROUTINE_SETTINGS: RoutineSettings = {
       dayNumber: 4,
       title: 'Recupero',
       description: 'Consolida i risultati e calma la pelle.',
-      colorTheme: 'sky',
+      colorTheme: 'green',
       isEnabled: true,
       steps: [
         { id: 'n4_1', label: 'Pulizia', productName: 'Hydro Boost Aqua Gel' },

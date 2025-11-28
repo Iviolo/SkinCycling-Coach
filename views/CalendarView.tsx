@@ -43,9 +43,10 @@ const CalendarView: React.FC = () => {
   };
 
   const getCycleIcon = (nightNum: number) => {
-      if (nightNum === 1) return <Droplet size={10} className="text-emerald-600" fill="currentColor" fillOpacity={0.2} />; // Exfoliate
-      if (nightNum === 2) return <Sparkles size={10} className="text-rose-500" fill="currentColor" fillOpacity={0.2} />; // Retinoid
-      return <Leaf size={10} className="text-sky-600" fill="currentColor" fillOpacity={0.2} />; // Recover
+      // 1: Orange, 2: Pink, 3,4: Green
+      if (nightNum === 1) return <Droplet size={10} style={{color: '#f4a460'}} fill="currentColor" fillOpacity={0.2} />; 
+      if (nightNum === 2) return <Sparkles size={10} style={{color: '#e084d9'}} fill="currentColor" fillOpacity={0.2} />; 
+      return <Leaf size={10} style={{color: '#7db8a8'}} fill="currentColor" fillOpacity={0.2} />; 
   };
 
   const calculateStats = () => {
@@ -108,26 +109,30 @@ const CalendarView: React.FC = () => {
              const log = logs[dateStr];
              const info = getCycleInfo(day);
              
-             // Bubble Styling
-             let bubbleBg = 'bg-stone-50';
-             let borderColor = 'border-transparent';
+             // Bubble Styling with explicit Hex
+             let bubbleBgStyle = { backgroundColor: '#f9fafb' }; // Default stone-50
+             let bubbleBorderStyle = { borderColor: 'transparent' };
 
-             if (info?.index === 1) bubbleBg = 'bg-emerald-50'; // Exfoliate
-             if (info?.index === 2) bubbleBg = 'bg-rose-50'; // Retinoid
-             if (info?.index === 3 || info?.index === 4) bubbleBg = 'bg-sky-50'; // Recover
+             if (info?.index === 1) bubbleBgStyle = { backgroundColor: 'rgba(244, 164, 96, 0.1)' }; // Orange/10
+             if (info?.index === 2) bubbleBgStyle = { backgroundColor: 'rgba(224, 132, 217, 0.1)' }; // Pink/10
+             if (info?.index === 3 || info?.index === 4) bubbleBgStyle = { backgroundColor: 'rgba(125, 184, 168, 0.1)' }; // Green/10
 
              // Completion Status
              const isDone = log?.pmCompleted;
-             if (isDone) borderColor = info?.index === 2 ? 'border-rose-300' : info?.index === 1 ? 'border-emerald-300' : 'border-sky-300';
+             if (isDone) {
+                 if (info?.index === 1) bubbleBorderStyle = { borderColor: '#f4a460' };
+                 else if (info?.index === 2) bubbleBorderStyle = { borderColor: '#e084d9' };
+                 else bubbleBorderStyle = { borderColor: '#7db8a8' };
+             }
 
              return (
                <div key={dateStr} className="flex flex-col items-center gap-1" onClick={() => setSelectedDay(day)}>
                    <div 
                      className={`
                         w-10 h-10 rounded-full flex items-center justify-center border-2 relative transition-all duration-300 active:scale-90
-                        ${bubbleBg} ${borderColor}
                         ${isToday ? 'ring-2 ring-stone-800 ring-offset-2' : ''}
                      `}
+                     style={{ ...bubbleBgStyle, ...bubbleBorderStyle }}
                    >
                      <span className={`text-xs font-semibold ${isDone ? 'text-stone-800' : 'text-stone-400'}`}>{format(day, 'd')}</span>
                      {/* Mini Icon */}

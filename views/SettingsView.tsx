@@ -77,6 +77,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
     setSettings({ ...settings, pmCycle: newPm });
   };
 
+  const getNightColor = (index: number) => {
+      // 0=night1(orange), 1=night2(pink), 2=night3(green), 3=night4(green)
+      if (index === 0) return '#f4a460';
+      if (index === 1) return '#e084d9';
+      return '#7db8a8';
+  };
+
   if (!settings) return <div className="p-10 text-center">Caricamento...</div>;
 
   return (
@@ -149,7 +156,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
                 
                 <div className="p-5 border-b border-stone-50 flex items-center justify-between bg-stone-50/50">
                    <div className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white ${night.isEnabled ? (nIdx === 0 ? 'bg-emerald-400' : nIdx === 1 ? 'bg-rose-400' : 'bg-sky-400') : 'bg-stone-300'}`}>
+                      <div 
+                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white`}
+                        style={{ backgroundColor: night.isEnabled ? getNightColor(nIdx) : '#d6d3d1' }}
+                      >
                         {nIdx + 1}
                       </div>
                       <input 

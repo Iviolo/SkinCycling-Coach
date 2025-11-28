@@ -5,11 +5,12 @@ interface CycleBadgeProps {
 }
 
 const CycleBadge: React.FC<CycleBadgeProps> = ({ night }) => {
+  // Orange #f4a460, Pink #e084d9, Green #7db8a8
   const colors = {
-    1: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    2: 'bg-purple-100 text-purple-700 border-purple-200',
-    3: 'bg-sky-100 text-sky-700 border-sky-200',
-    4: 'bg-sky-100 text-sky-700 border-sky-200',
+    1: 'bg-[#f4a460]/10 text-[#f4a460] border-[#f4a460]/20', // Night 1 - Orange
+    2: 'bg-[#e084d9]/10 text-[#e084d9] border-[#e084d9]/20', // Night 2 - Pink
+    3: 'bg-[#7db8a8]/10 text-[#7db8a8] border-[#7db8a8]/20', // Night 3 - Green
+    4: 'bg-[#7db8a8]/10 text-[#7db8a8] border-[#7db8a8]/20', // Night 4 - Green
   };
 
   const labels = {

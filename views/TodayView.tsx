@@ -16,34 +16,34 @@ const parseISO = (dateStr: string) => {
     return new Date(y, m - 1, d);
 };
 
-// Helper for step strip color
-const getStepColor = (label: string) => {
-  const l = label.toLowerCase();
-  if (l.includes('detersione') || l.includes('pulizia')) return 'bg-cyan-100';
-  if (l.includes('siero') || l.includes('trattamento')) return 'bg-purple-200';
-  if (l.includes('spf')) return 'bg-amber-200';
-  if (l.includes('attivo') || l.includes('esfoliante') || l.includes('retin')) return 'bg-rose-300';
-  return 'bg-stone-200';
-};
-
 interface StepCardProps {
     step: RoutineStep;
     checked: boolean;
     onClick: () => void;
     imageUrl?: string;
+    customColorClass?: string;
 }
 
-const StepCard: React.FC<StepCardProps> = ({ step, checked, onClick, imageUrl }) => {
+const StepCard: React.FC<StepCardProps> = ({ step, checked, onClick, imageUrl, customColorClass }) => {
+    // Default color logic for AM if no custom class is passed
+    const getStepColor = (label: string) => {
+        const l = label.toLowerCase();
+        if (l.includes('spf')) return 'bg-amber-200';
+        return 'bg-stone-200';
+    };
+
+    const barColor = customColorClass || getStepColor(step.label);
+
     return (
         <div 
             onClick={onClick}
             className={`relative overflow-hidden bg-white rounded-2xl p-3 pr-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-stone-50 flex items-center gap-4 transition-all duration-300 active:scale-[0.98] ${checked ? 'opacity-60 grayscale-[0.5]' : ''}`}
         >
             {/* Color Strip */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${getStepColor(step.label)}`} />
+            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${barColor}`} />
 
             <div className={`w-6 h-6 rounded-full border-2 flex shrink-0 items-center justify-center transition-all duration-300 ml-2 ${checked ? 'bg-emerald-400 border-emerald-400' : 'border-stone-200 bg-stone-50'}`}>
-                {checked && <Check size={14} className="text-white animate-[bounce_0.4s_ease-in-out]" />}
+                {checked && <Check size={14} className="text-white animate-pop-bounce" />}
             </div>
 
             {/* Product Image */}
@@ -160,19 +160,52 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
   const heroIcon = isNightTime ? <Moon strokeWidth={1} size={48} className="text-rose-300" /> : <Sun strokeWidth={1} size={48} className="text-amber-300" />;
   const motivation = isNightTime ? "Serata relax per la tua pelle." : "Pelle coccolata e protetta oggi.";
 
-  // Cycle Night Pill Colors
-  const getBadgeColor = (theme: string) => {
+  // Specific Colors Hex
+  const colors = {
+      orange: '#f4a460',
+      pink: '#e084d9',
+      green: '#7db8a8'
+  };
+
+  // Cycle Night Colors
+  const getThemeHex = (theme: string) => {
       switch(theme) {
-          case 'emerald': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-          case 'purple': return 'bg-purple-100 text-purple-700 border-purple-200';
-          default: return 'bg-rose-100 text-rose-700 border-rose-200';
+          case 'orange': return colors.orange;
+          case 'pink': return colors.pink;
+          default: return colors.green;
       }
   };
-  const badgeClass = getBadgeColor(activeCycleNight.colorTheme);
+  
+  const themeHex = getThemeHex(activeCycleNight.colorTheme);
+  
+  // Tailwind arbitrary values for Badge
+  const getBadgeClass = (theme: string) => {
+     switch(theme) {
+         case 'orange': return 'bg-[#f4a460]/10 text-[#f4a460] border-[#f4a460]/20';
+         case 'pink': return 'bg-[#e084d9]/10 text-[#e084d9] border-[#e084d9]/20';
+         case 'green': return 'bg-[#7db8a8]/10 text-[#7db8a8] border-[#7db8a8]/20';
+         default: return 'bg-stone-100 text-stone-600 border-stone-200';
+     }
+  };
+  const badgeClass = getBadgeClass(activeCycleNight.colorTheme);
+
+  // Side bar color for PM steps
+  const pmStepBarClass = `bg-[${themeHex}]`;
 
   return (
     <div className="pt-8 pb-32 px-5 max-w-md mx-auto space-y-8">
-      
+      {/* Inject Keyframes */}
+      <style>{`
+        @keyframes pop-bounce {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); }
+        }
+        .animate-pop-bounce {
+          animation: pop-bounce 0.4s ease-in-out;
+        }
+      `}</style>
+
       {/* Top Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -261,8 +294,8 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
       {/* PM Section */}
       <section>
           <div className="flex items-center gap-3 mb-4 pl-1">
-              <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center">
-                 <Moon size={16} className="text-indigo-300" />
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center`} style={{ backgroundColor: `${themeHex}20` }}>
+                 <Moon size={16} style={{ color: themeHex }} />
               </div>
               <h3 className="font-nunito font-bold text-lg text-stone-700">Rituale Sera</h3>
           </div>
@@ -275,6 +308,7 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
                     checked={pmChecks.has(step.id)} 
                     onClick={() => !todayLog?.pmCompleted && toggleCheck(step.id, 'PM')} 
                     imageUrl={getProductImage(step.productName)}
+                    customColorClass={pmStepBarClass}
                  />
              ))}
           </div>
@@ -285,9 +319,10 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
                 disabled={pmChecks.size < pmSteps.length}
                 className={`w-full mt-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all duration-500 shadow-lg ${
                     pmChecks.size === pmSteps.length 
-                    ? 'bg-rose-400 text-white shadow-rose-200 hover:scale-[1.02]' 
+                    ? 'text-white hover:scale-[1.02]' 
                     : 'bg-stone-100 text-stone-300 cursor-not-allowed shadow-none'
                 }`}
+                style={pmChecks.size === pmSteps.length ? { backgroundColor: themeHex, boxShadow: `0 10px 30px -10px ${themeHex}80` } : {}}
               >
                 CONCLUDI GIORNATA
               </button>

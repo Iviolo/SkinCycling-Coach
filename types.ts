@@ -41,7 +41,7 @@ export interface CycleNightConfig {
   title: string;
   description: string;
   steps: RoutineStep[];
-  colorTheme: 'emerald' | 'purple' | 'sky' | 'rose' | 'amber'; 
+  colorTheme: 'orange' | 'pink' | 'green'; 
   isEnabled: boolean;
 }
 
