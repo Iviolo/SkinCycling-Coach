@@ -1,0 +1,214 @@
+import React, { useState, useEffect } from 'react';
+import { endOfMonth, eachDayOfInterval, format, isSameDay, getDay, differenceInDays, isAfter, isBefore, endOfDay } from 'date-fns';
+import it from 'date-fns/locale/it';
+import { getLogs, getStartDate, getRoutineSettings } from '../services/storageService';
+import { Check, X, Zap, Droplet, Sparkles, Leaf, ChevronUp } from 'lucide-react';
+import { RoutineSettings, DailyLog } from '../types';
+
+// Helpers to replace missing/problematic exports
+const parseISO = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+};
+
+const startOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+};
+
+const CalendarView: React.FC = () => {
+  const [settings, setSettings] = useState<RoutineSettings | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  
+  const today = new Date();
+  const daysInMonth = eachDayOfInterval({
+    start: startOfMonth(today),
+    end: endOfMonth(today),
+  });
+
+  useEffect(() => {
+    setSettings(getRoutineSettings());
+  }, []);
+
+  const logs = getLogs();
+  const startDate = parseISO(getStartDate());
+  const startingDayIndex = getDay(startOfMonth(today)) === 0 ? 6 : getDay(startOfMonth(today)) - 1;
+
+  const getCycleInfo = (date: Date) => {
+    if (!settings) return null;
+    const enabledNights = settings.pmCycle.filter(n => n.isEnabled);
+    const len = enabledNights.length || 1;
+    const diff = differenceInDays(date, startDate);
+    const cycleIndex = ((diff % len) + len) % len;
+    return { config: enabledNights[cycleIndex], index: cycleIndex + 1 };
+  };
+
+  const getCycleIcon = (nightNum: number) => {
+      if (nightNum === 1) return <Droplet size={10} className="text-emerald-600" fill="currentColor" fillOpacity={0.2} />; // Exfoliate
+      if (nightNum === 2) return <Sparkles size={10} className="text-rose-500" fill="currentColor" fillOpacity={0.2} />; // Retinoid
+      return <Leaf size={10} className="text-sky-600" fill="currentColor" fillOpacity={0.2} />; // Recover
+  };
+
+  const calculateStats = () => {
+    const pastDaysInMonth = daysInMonth.filter(d => isBefore(d, endOfDay(today)));
+    const totalDays = pastDaysInMonth.length || 1;
+    let amCount = 0;
+    let pmCount = 0;
+    let night1Count = 0;
+    let night2Count = 0;
+
+    pastDaysInMonth.forEach(day => {
+        const dateStr = format(day, 'yyyy-MM-dd');
+        const log = logs[dateStr];
+        if (log) {
+            if (log.amCompleted) amCount++;
+            if (log.pmCompleted) {
+                pmCount++;
+                if (log.cycleDay === 1) night1Count++;
+                if (log.cycleDay === 2) night2Count++;
+            }
+        }
+    });
+
+    return {
+        amPercent: Math.round((amCount / totalDays) * 100),
+        pmPercent: Math.round((pmCount / totalDays) * 100),
+        night1Count,
+        night2Count
+    };
+  };
+
+  const stats = calculateStats();
+
+  if (!settings) return <div className="p-10 text-center text-stone-300">Caricamento...</div>;
+
+  return (
+    <div className="pb-24 pt-6 px-4 max-w-md mx-auto h-screen overflow-y-auto no-scrollbar relative">
+       <h1 className="text-2xl font-nunito font-bold text-stone-800 mb-6 pl-2">Il tuo Viaggio</h1>
+
+       {/* Calendar Card */}
+       <div className="bg-white rounded-[2rem] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-stone-50 mb-8">
+         <div className="text-center font-nunito font-bold text-lg capitalize text-stone-700 mb-6">
+            {format(today, 'MMMM yyyy', { locale: it })}
+         </div>
+
+         <div className="grid grid-cols-7 gap-y-4 mb-2">
+            {['L', 'M', 'M', 'G', 'V', 'S', 'D'].map((d, i) => (
+              <div key={i} className="text-center text-[10px] text-stone-400 font-bold tracking-widest">
+                {d}
+              </div>
+            ))}
+         </div>
+
+         <div className="grid grid-cols-7 gap-y-4 gap-x-1">
+           {Array.from({ length: startingDayIndex }).map((_, i) => <div key={`empty-${i}`} />)}
+           
+           {daysInMonth.map((day) => {
+             const dateStr = format(day, 'yyyy-MM-dd');
+             const isToday = isSameDay(day, today);
+             const log = logs[dateStr];
+             const info = getCycleInfo(day);
+             
+             // Bubble Styling
+             let bubbleBg = 'bg-stone-50';
+             let borderColor = 'border-transparent';
+
+             if (info?.index === 1) bubbleBg = 'bg-emerald-50'; // Exfoliate
+             if (info?.index === 2) bubbleBg = 'bg-rose-50'; // Retinoid
+             if (info?.index === 3 || info?.index === 4) bubbleBg = 'bg-sky-50'; // Recover
+
+             // Completion Status
+             const isDone = log?.pmCompleted;
+             if (isDone) borderColor = info?.index === 2 ? 'border-rose-300' : info?.index === 1 ? 'border-emerald-300' : 'border-sky-300';
+
+             return (
+               <div key={dateStr} className="flex flex-col items-center gap-1" onClick={() => setSelectedDay(day)}>
+                   <div 
+                     className={`
+                        w-10 h-10 rounded-full flex items-center justify-center border-2 relative transition-all duration-300 active:scale-90
+                        ${bubbleBg} ${borderColor}
+                        ${isToday ? 'ring-2 ring-stone-800 ring-offset-2' : ''}
+                     `}
+                   >
+                     <span className={`text-xs font-semibold ${isDone ? 'text-stone-800' : 'text-stone-400'}`}>{format(day, 'd')}</span>
+                     {/* Mini Icon */}
+                     <div className="absolute -bottom-1.5 bg-white rounded-full p-0.5 shadow-sm border border-stone-50">
+                        {info && getCycleIcon(info.index)}
+                     </div>
+                   </div>
+               </div>
+             );
+           })}
+         </div>
+       </div>
+
+       {/* Stats Minimal */}
+       <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-3xl border border-stone-50 shadow-sm flex flex-col items-center">
+              <span className="text-3xl font-nunito font-bold text-rose-300">{stats.pmPercent}%</span>
+              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Costanza Sera</span>
+          </div>
+          <div className="bg-white p-4 rounded-3xl border border-stone-50 shadow-sm flex flex-col items-center">
+              <div className="flex items-end gap-1">
+                <span className="text-xl font-bold text-stone-600">{stats.night1Count}</span>
+                <span className="text-xs text-stone-400 mb-1">BHA</span>
+                <span className="text-stone-300 mx-1">/</span>
+                <span className="text-xl font-bold text-stone-600">{stats.night2Count}</span>
+                <span className="text-xs text-stone-400 mb-1">Ret.</span>
+              </div>
+              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Trattamenti</span>
+          </div>
+       </div>
+
+       {/* Bottom Sheet Overlay */}
+       {selectedDay && (() => {
+           const dateStr = format(selectedDay, 'yyyy-MM-dd');
+           const log = logs[dateStr];
+           const info = getCycleInfo(selectedDay);
+           
+           return (
+             <>
+               <div className="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-50 transition-opacity" onClick={() => setSelectedDay(null)} />
+               <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl rounded-t-[2.5rem] p-8 pb-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50 animate-slide-up max-w-md mx-auto">
+                   <div className="w-12 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
+                   
+                   <div className="flex justify-between items-start mb-6">
+                       <div>
+                           <h3 className="text-2xl font-nunito font-bold text-stone-800 capitalize">
+                               {format(selectedDay, 'EEEE d MMMM', { locale: it })}
+                           </h3>
+                           <div className="flex items-center gap-2 mt-2">
+                               {info && getCycleIcon(info.index)}
+                               <span className="text-sm text-stone-500 font-medium">Notte {info?.index}: {info?.config.title}</span>
+                           </div>
+                       </div>
+                       <button onClick={() => setSelectedDay(null)} className="p-2 bg-stone-100 rounded-full text-stone-400">
+                           <X size={20} />
+                       </button>
+                   </div>
+
+                   <div className="space-y-4">
+                       <div className={`p-4 rounded-2xl border flex items-center justify-between ${log?.amCompleted ? 'bg-amber-50 border-amber-100' : 'bg-stone-50 border-stone-100'}`}>
+                           <span className="text-sm font-bold text-stone-600">Routine Mattina (SPF)</span>
+                           {log?.amCompleted ? <Check className="text-amber-500" size={20} /> : <span className="text-xs text-stone-400">Non fatta</span>}
+                       </div>
+                       <div className={`p-4 rounded-2xl border flex items-center justify-between ${log?.pmCompleted ? 'bg-rose-50 border-rose-100' : 'bg-stone-50 border-stone-100'}`}>
+                           <span className="text-sm font-bold text-stone-600">Routine Sera</span>
+                           {log?.pmCompleted ? <Check className="text-rose-400" size={20} /> : <span className="text-xs text-stone-400">Non fatta</span>}
+                       </div>
+                   </div>
+
+                   {log?.notes && (
+                       <div className="mt-6">
+                           <h4 className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Note Pelle</h4>
+                           <p className="text-sm text-stone-600 italic bg-stone-50 p-3 rounded-xl border border-stone-100">"{log.notes}"</p>
+                       </div>
+                   )}
+               </div>
+             </>
+           );
+       })()}
+    </div>
+  );
+};
+
+export default CalendarView;

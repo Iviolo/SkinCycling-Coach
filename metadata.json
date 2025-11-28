@@ -1,0 +1,5 @@
+{
+  "name": "SkinCycling Coach",
+  "description": "A mobile-first skincare tracking application designed for the 4-night skin cycling routine. Features include daily routine guidance, product inventory, calendar tracking, and educational resources.",
+  "requestFramePermissions": []
+}
