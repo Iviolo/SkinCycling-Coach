@@ -6,61 +6,141 @@
   <title>SkinCycling Coach</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: sans-serif; background: #fce7f3; color: #333; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fce7f3, #fae8ff); color: #333; padding: 20px; min-height: 100vh; }
     .container { max-width: 500px; margin: 0 auto; }
-    h1 { font-size: 28px; text-align: center; margin: 20px 0; color: #7c2d12; }
-    .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
-    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
-    button { padding: 10px 16px; background: #ec4899; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    h1 { font-size: 32px; text-align: center; margin: 30px 0 10px; color: #7c2d12; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+    .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+    input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 12px; }
+    button { padding: 10px 16px; background: #ec4899; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.2s; }
     button:hover { background: #be185d; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
-    .tab { flex: 1; padding: 8px; background: #f3f4f6; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-    .tab.active { background: #ec4899; color: white; }
-    .night { border: 2px solid #fce7f3; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: white; }
-    .night-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .night-title { font-size: 16px; font-weight: bold; }
-    .complete-btn { padding: 6px 12px; font-size: 12px; background: #f3f4f6; border: none; border-radius: 4px; cursor: pointer; }
-    .complete-btn.done { background: #22c55e; color: white; }
+    .btn-full { width: 100%; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tab { flex: 1; min-width: 80px; padding: 10px; background: #f3f4f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+    .tab.active { background: #ec4899; color: white; border-color: #be185d; }
+    .nights { margin-top: 20px; }
+    .night { background: white; border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #ec4899; }
+    .night-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .night-title { font-size: 16px; font-weight: bold; color: #333; }
+    .night-btn { padding: 6px 12px; font-size: 12px; background: #f3f4f6; color: #333; }
+    .night-btn.done { background: #22c55e; color: white; }
     .products { list-style: none; }
-    .product { display: flex; justify-content: space-between; padding: 8px; background: #f9fafb; border-radius: 4px; margin-bottom: 6px; }
-    .remove { background: #ef4444; color: white; padding: 4px 8px; border: none; cursor: pointer; border-radius: 2px; }
-    .remove:hover { background: #dc2626; }
-    .empty { color: #999; font-style: italic; padding: 8px; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9fafb; border-radius: 6px; margin-bottom: 8px; }
+    .product-text { color: #333; }
+    .btn-remove { background: #ef4444; padding: 4px 8px; font-size: 12px; }
+    .btn-remove:hover { background: #dc2626; }
+    .empty-msg { color: #999; font-style: italic; padding: 8px; text-align: center; }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <div class="container">
+    <h1>🌙 SkinCycling Coach</h1>
+    <p class="subtitle">Traccia la tua routine skincare 4 notti</p>
+    
+    <div class="card">
+      <label for="productInput">Aggiungi Prodotto:</label>
+      <input type="text" id="productInput" placeholder="Es: Retinolo, Vitamina C...">
+      <button class="btn-full" onclick="addProduct()">Aggiungi</button>
+      
+      <div class="tabs">
+        <button class="tab active" onclick="selectNight('night1')">N1</button>
+        <button class="tab" onclick="selectNight('night2')">N2</button>
+        <button class="tab" onclick="selectNight('night3')">N3</button>
+        <button class="tab" onclick="selectNight('night4')">N4</button>
+      </div>
+    </div>
+    
+    <div class="nights">
+      <div class="night">
+        <div class="night-header">
+          <div class="night-title">Notte 1</div>
+          <button class="night-btn" onclick="toggleNight('night1')">Marca</button>
+        </div>
+        <ul class="products" id="night1-products"><li class="empty-msg">Nessun prodotto</li></ul>
+      </div>
+      
+      <div class="night">
+        <div class="night-header">
+          <div class="night-title">Notte 2</div>
+          <button class="night-btn" onclick="toggleNight('night2')">Marca</button>
+        </div>
+        <ul class="products" id="night2-products"><li class="empty-msg">Nessun prodotto</li></ul>
+      </div>
+      
+      <div class="night">
+        <div class="night-header">
+          <div class="night-title">Notte 3</div>
+          <button class="night-btn" onclick="toggleNight('night3')">Marca</button>
+        </div>
+        <ul class="products" id="night3-products"><li class="empty-msg">Nessun prodotto</li></ul>
+      </div>
+      
+      <div class="night">
+        <div class="night-header">
+          <div class="night-title">Notte 4</div>
+          <button class="night-btn" onclick="toggleNight('night4')">Marca</button>
+        </div>
+        <ul class="products" id="night4-products"><li class="empty-msg">Nessun prodotto</li></ul>
+      </div>
+    </div>
+  </div>
+  
   <script>
-    const { useState } = React;
-    const { createRoot } = ReactDOM;
-    function App() {
-      const [data, setData] = useState({night1: {p:[], d:0}, night2: {p:[], d:0}, night3: {p:[], d:0}, night4: {p:[], d:0}});
-      const [newP, setNewP] = useState('');
-      const [sel, setSel] = useState('night1');
-      const add = () => { if(newP.trim()) { setData(prev => ({...prev, [sel]: {...prev[sel], p: [...prev[sel].p, newP]}})); setNewP(''); } };
-      const del = (n, i) => { setData(prev => ({...prev, [n]: {...prev[n], p: prev[n].p.filter((_, x) => x !== i)}})); };
-      const tog = (n) => { setData(prev => ({...prev, [n]: {...prev[n], d: 1-prev[n].d}})); };
-      return React.createElement('div', {className: 'container'},
-        React.createElement('h1', null, '🌙 SkinCycling Coach'),
-        React.createElement('p', {className: 'subtitle'}, 'Traccia la tua routine skincare'),
-        React.createElement('div', {className: 'card'},
-          React.createElement('input', {type: 'text', value: newP, onChange: e => setNewP(e.target.value), onKeyPress: e => e.key==='Enter' && add(), placeholder: 'Es: Retinolo...'}),
-          React.createElement('button', {onClick: add, style: {width: '100%'}}, 'Aggiungi Prodotto'),
-          React.createElement('div', {className: 'tabs'}, ['night1','night2','night3','night4'].map((n, i) => React.createElement('button', {key: n, className: 'tab' + (sel===n ? ' active' : ''), onClick: () => setSel(n)}, 'N' + (i+1))))
-        ),
-        React.createElement('div', null, ['night1','night2','night3','night4'].map((n, i) => React.createElement('div', {key: n, className: 'night'},
-          React.createElement('div', {className: 'night-header'},
-            React.createElement('div', {className: 'night-title'}, 'Notte ' + (i+1)),
-            React.createElement('button', {className: 'complete-btn' + (data[n].d ? ' done' : ''), onClick: () => tog(n)}, data[n].d ? '✓' : '○')
-          ),
-          React.createElement('ul', {className: 'products'}, data[n].p.length ? data[n].p.map((prod, idx) => React.createElement('li', {key: idx, className: 'product'}, React.createElement('span', null, prod), React.createElement('button', {className: 'remove', onClick: () => del(n, idx)}, '×'))) : React.createElement('li', {className: 'empty'}, 'Nessun prodotto'))
-        )))
-      );
+    let data = {
+      night1: { products: [], done: false },
+      night2: { products: [], done: false },
+      night3: { products: [], done: false },
+      night4: { products: [], done: false }
+    };
+    let currentNight = 'night1';
+    
+    function selectNight(night) {
+      currentNight = night;
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
     }
-    createRoot(document.getElementById('root')).render(React.createElement(App));
+    
+    function addProduct() {
+      const input = document.getElementById('productInput');
+      const product = input.value.trim();
+      if (product) {
+        data[currentNight].products.push(product);
+        input.value = '';
+        renderProducts(currentNight);
+      }
+    }
+    
+    function removeProduct(night, index) {
+      data[night].products.splice(index, 1);
+      renderProducts(night);
+    }
+    
+    function toggleNight(night) {
+      data[night].done = !data[night].done;
+      const btn = event.target;
+      btn.textContent = data[night].done ? '✓ Fatto' : 'Marca';
+      btn.classList.toggle('done');
+    }
+    
+    function renderProducts(night) {
+      const ul = document.getElementById(night + '-products');
+      ul.innerHTML = '';
+      if (data[night].products.length === 0) {
+        ul.innerHTML = '<li class="empty-msg">Nessun prodotto</li>';
+      } else {
+        data[night].products.forEach((prod, idx) => {
+          const li = document.createElement('li');
+          li.className = 'product-item';
+          li.innerHTML = `<span class="product-text">${prod}</span><button class="btn-remove" onclick="removeProduct('${night}', ${idx})">×</button>`;
+          ul.appendChild(li);
+        });
+      }
+    }
+    
+    document.getElementById('productInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addProduct();
+    });
   </script>
 </body>
 </html>
