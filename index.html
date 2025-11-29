@@ -1,49 +1,99 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SkinCycling Coach</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #FDFCF8; /* Ivory / Warm White */
-        color: #44403C; /* Stone 700 */
-        -webkit-tap-highlight-color: transparent;
-      }
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Nunito', sans-serif;
-      }
-      /* Hide scrollbar for clean UI */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f4a460 0%, #e084d9 50%, #7db8a8 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .app { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-width: 500px; width: 100%; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #f4a460, #e084d9); padding: 30px; color: white; text-align: center; }
+        .header h1 { font-size: 32px; font-weight: bold; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { padding: 30px; }
+        .date { color: #f4a460; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 20px; }
+        .greeting { font-size: 28px; font-weight: bold; margin-bottom: 30px; }
+        .greeting .pink { color: #e084d9; }
+        .cycle-badge { display: inline-block; background: #f4a460; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+        .routine-title { font-size: 18px; font-weight: 600; color: #333; margin-top: 25px; margin-bottom: 20px; display: flex; align-items: center; }
+        .routine-title::before { content: ''; display: inline-block; width: 30px; height: 30px; background: #f4a460; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+        .product-list { display: flex; flex-direction: column; gap: 15px; }
+        .product { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 12px; }
+        .product-checkbox { width: 20px; height: 20px; border: 2px solid #e084d9; border-radius: 50%; margin-right: 15px; flex-shrink: 0; cursor: pointer; }
+        .product-checkbox.checked { background: #e084d9; }
+        .product-info { flex: 1; }
+        .product-name { font-weight: 600; color: #333; margin-bottom: 4px; }
+        .product-brand { font-size: 12px; color: #999; }
+        .product-image { width: 40px; height: 40px; background: #e084d9; border-radius: 8px; margin-left: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+        .nav { display: flex; justify-content: space-around; padding: 20px; background: #f9f9f9; border-top: 1px solid #eee; }
+        .nav-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-size: 24px; }
+        .nav-icon:hover { background: #ede9fe; }
+        .nav-icon.active { color: #e084d9; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "date-fns/": "https://aistudiocdn.com/date-fns@^4.1.0/",
-    "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0"
-  }
-}
-</script>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body>
+    <div class="app">
+        <div class="header">
+            <h1>Ciao, <span class="pink">Beauty</span></h1>
+            <p>La tua routine skincare personalizzata</p>
+        </div>
+        <div class="content">
+            <div class="date">SABATO 29 NOVEMBRE</div>
+            <div class="cycle-badge">🌙 NOTTE 1 / 4</div>
+            <div class="greeting">Serata relax per la tua <span class="pink">pelle.</span></div>
+            
+            <div class="routine-title">Rituale Mattina</div>
+            <div class="product-list">
+                <div class="product">
+                    <div class="product-checkbox"></div>
+                    <div class="product-info">
+                        <div class="product-name">Detersione</div>
+                        <div class="product-brand">Hydro Boost Aqua Gel</div>
+                    </div>
+                    <div class="product-image">💧</div>
+                </div>
+                <div class="product">
+                    <div class="product-checkbox"></div>
+                    <div class="product-info">
+                        <div class="product-name">Siero</div>
+                        <div class="product-brand">Multi-Peptide + HA Serum</div>
+                    </div>
+                    <div class="product-image">✨</div>
+                </div>
+                <div class="product">
+                    <div class="product-checkbox"></div>
+                    <div class="product-info">
+                        <div class="product-name">Crema</div>
+                        <div class="product-brand">LiftActiv Collagen Specialist</div>
+                    </div>
+                    <div class="product-image">🧴</div>
+                </div>
+                <div class="product">
+                    <div class="product-checkbox"></div>
+                    <div class="product-info">
+                        <div class="product-name">SPF</div>
+                        <div class="product-brand">Anthelios UVMUNE 400 SPF 50+</div>
+                    </div>
+                    <div class="product-image">☀️</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav">
+            <div class="nav-icon active">📋</div>
+            <div class="nav-icon">📅</div>
+            <div class="nav-icon">💄</div>
+            <div class="nav-icon">⚙️</div>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+    </script>
+</body>
 </html>
