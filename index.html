@@ -1,155 +1,66 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SkinCycling Coach</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #FDFCF8;
-      color: #44403C;
-      -webkit-tap-highlight-color: transparent;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Nunito', sans-serif;
-    }
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: sans-serif; background: #fce7f3; color: #333; padding: 20px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    h1 { font-size: 28px; text-align: center; margin: 20px 0; color: #7c2d12; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
+    button { padding: 10px 16px; background: #ec4899; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #be185d; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+    .tab { flex: 1; padding: 8px; background: #f3f4f6; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .tab.active { background: #ec4899; color: white; }
+    .night { border: 2px solid #fce7f3; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: white; }
+    .night-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .night-title { font-size: 16px; font-weight: bold; }
+    .complete-btn { padding: 6px 12px; font-size: 12px; background: #f3f4f6; border: none; border-radius: 4px; cursor: pointer; }
+    .complete-btn.done { background: #22c55e; color: white; }
+    .products { list-style: none; }
+    .product { display: flex; justify-content: space-between; padding: 8px; background: #f9fafb; border-radius: 4px; margin-bottom: 6px; }
+    .remove { background: #ef4444; color: white; padding: 4px 8px; border: none; cursor: pointer; border-radius: 2px; }
+    .remove:hover { background: #dc2626; }
+    .empty { color: #999; font-style: italic; padding: 8px; }
   </style>
 </head>
 <body>
   <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script>
-    const { useState, useEffect, createElement: h } = React;
+    const { useState } = React;
     const { createRoot } = ReactDOM;
-
     function App() {
-      const [routine, setRoutine] = useState({
-        night1: { products: [], completed: false },
-        night2: { products: [], completed: false },
-        night3: { products: [], completed: false },
-        night4: { products: [], completed: false }
-      });
-      const [newProduct, setNewProduct] = useState('');
-      const [selectedNight, setSelectedNight] = useState('night1');
-
-      const addProduct = () => {
-        if (newProduct.trim()) {
-          setRoutine(prev => ({
-            ...prev,
-            [selectedNight]: {
-              ...prev[selectedNight],
-              products: [...prev[selectedNight].products, newProduct]
-            }
-          }));
-          setNewProduct('');
-        }
-      };
-
-      const toggleNightComplete = (night) => {
-        setRoutine(prev => ({
-          ...prev,
-          [night]: { ...prev[night], completed: !prev[night].completed }
-        }));
-      };
-
-      const removeProduct = (night, index) => {
-        setRoutine(prev => ({
-          ...prev,
-          [night]: {
-            ...prev[night],
-            products: prev[night].products.filter((_, i) => i !== index)
-          }
-        }));
-      };
-
-      return h('div', { className: 'min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50 p-4' },
-        h('div', { className: 'max-w-md mx-auto' },
-          h('div', { className: 'text-center mb-8 mt-6' },
-            h('h1', { className: 'text-4xl font-bold text-gray-800 mb-2' }, '🌙 SkinCycling Coach'),
-            h('p', { className: 'text-gray-600' }, 'Traccia la tua routine skincare 4 notti')
+      const [data, setData] = useState({night1: {p:[], d:0}, night2: {p:[], d:0}, night3: {p:[], d:0}, night4: {p:[], d:0}});
+      const [newP, setNewP] = useState('');
+      const [sel, setSel] = useState('night1');
+      const add = () => { if(newP.trim()) { setData(prev => ({...prev, [sel]: {...prev[sel], p: [...prev[sel].p, newP]}})); setNewP(''); } };
+      const del = (n, i) => { setData(prev => ({...prev, [n]: {...prev[n], p: prev[n].p.filter((_, x) => x !== i)}})); };
+      const tog = (n) => { setData(prev => ({...prev, [n]: {...prev[n], d: 1-prev[n].d}})); };
+      return React.createElement('div', {className: 'container'},
+        React.createElement('h1', null, '🌙 SkinCycling Coach'),
+        React.createElement('p', {className: 'subtitle'}, 'Traccia la tua routine skincare'),
+        React.createElement('div', {className: 'card'},
+          React.createElement('input', {type: 'text', value: newP, onChange: e => setNewP(e.target.value), onKeyPress: e => e.key==='Enter' && add(), placeholder: 'Es: Retinolo...'}),
+          React.createElement('button', {onClick: add, style: {width: '100%'}}, 'Aggiungi Prodotto'),
+          React.createElement('div', {className: 'tabs'}, ['night1','night2','night3','night4'].map((n, i) => React.createElement('button', {key: n, className: 'tab' + (sel===n ? ' active' : ''), onClick: () => setSel(n)}, 'N' + (i+1))))
+        ),
+        React.createElement('div', null, ['night1','night2','night3','night4'].map((n, i) => React.createElement('div', {key: n, className: 'night'},
+          React.createElement('div', {className: 'night-header'},
+            React.createElement('div', {className: 'night-title'}, 'Notte ' + (i+1)),
+            React.createElement('button', {className: 'complete-btn' + (data[n].d ? ' done' : ''), onClick: () => tog(n)}, data[n].d ? '✓' : '○')
           ),
-
-          h('div', { className: 'glass-panel rounded-2xl p-6 mb-6' },
-            h('div', { className: 'mb-4' },
-              h('label', { className: 'block text-sm font-semibold text-gray-700 mb-2' }, 'Aggiungi Prodotto:'),
-              h('div', { className: 'flex gap-2' },
-                h('input', {
-                  type: 'text',
-                  value: newProduct,
-                  onChange: (e) => setNewProduct(e.target.value),
-                  onKeyPress: (e) => e.key === 'Enter' && addProduct(),
-                  placeholder: 'Es: Retinolo, Vitamina C...',
-                  className: 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500'
-                }),
-                h('button', {
-                  onClick: addProduct,
-                  className: 'px-4 py-2 bg-pink-500 text-white rounded-lg font-medium hover:bg-pink-600 transition'
-                }, '+')
-              )
-            ),
-            h('div', { className: 'flex gap-2 mb-4' },
-              ['night1', 'night2', 'night3', 'night4'].map((night, i) =>
-                h('button', {
-                  key: night,
-                  onClick: () => setSelectedNight(night),
-                  className: `flex-1 py-2 rounded-lg font-medium transition ${
-                    selectedNight === night
-                      ? 'bg-pink-500 text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`
-                }, `Notte ${i + 1}`)
-              )
-            )
-          ),
-
-          h('div', { className: 'space-y-4' },
-            ['night1', 'night2', 'night3', 'night4'].map((night, i) =>
-              h('div', { key: night, className: 'glass-panel rounded-xl p-4' },
-                h('div', { className: 'flex items-center justify-between mb-3' },
-                  h('h2', { className: 'text-lg font-semibold text-gray-800' }, `Notte ${i + 1}`),
-                  h('button', {
-                    onClick: () => toggleNightComplete(night),
-                    className: `px-3 py-1 rounded-full text-sm font-medium transition ${
-                      routine[night].completed
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                    }`
-                  }, routine[night].completed ? '✓ Fatto' : 'Marca come fatto')
-                ),
-                h('ul', { className: 'space-y-2' },
-                  routine[night].products.length > 0
-                    ? routine[night].products.map((product, idx) =>
-                        h('li', {
-                          key: idx,
-                          className: 'flex justify-between items-center bg-white bg-opacity-50 p-2 rounded-lg'
-                        },
-                          h('span', { className: 'text-gray-700' }, product),
-                          h('button', {
-                            onClick: () => removeProduct(night, idx),
-                            className: 'text-red-500 hover:text-red-700 font-bold'
-                          }, '×')
-                        )
-                      )
-                    : h('li', { className: 'text-gray-500 italic' }, 'Nessun prodotto aggiunto')
-                )
-              )
-            )
-          )
-        )
+          React.createElement('ul', {className: 'products'}, data[n].p.length ? data[n].p.map((prod, idx) => React.createElement('li', {key: idx, className: 'product'}, React.createElement('span', null, prod), React.createElement('button', {className: 'remove', onClick: () => del(n, idx)}, '×'))) : React.createElement('li', {className: 'empty'}, 'Nessun prodotto'))
+        )))
       );
     }
-
-    const root = createRoot(document.getElementById('root'));
-    root.render(h(App));
+    createRoot(document.getElementById('root')).render(React.createElement(App));
   </script>
 </body>
 </html>
