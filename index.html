@@ -1,99 +1,49 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SkinCycling Coach</title>
-    <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f4a460 0%, #e084d9 50%, #7db8a8 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .app { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-width: 500px; width: 100%; overflow: hidden; }
-        .header { background: linear-gradient(135deg, #f4a460, #e084d9); padding: 30px; color: white; text-align: center; }
-        .header h1 { font-size: 32px; font-weight: bold; margin-bottom: 8px; }
-        .header p { font-size: 14px; opacity: 0.9; }
-        .content { padding: 30px; }
-        .date { color: #f4a460; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 20px; }
-        .greeting { font-size: 28px; font-weight: bold; margin-bottom: 30px; }
-        .greeting .pink { color: #e084d9; }
-        .cycle-badge { display: inline-block; background: #f4a460; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
-        .routine-title { font-size: 18px; font-weight: 600; color: #333; margin-top: 25px; margin-bottom: 20px; display: flex; align-items: center; }
-        .routine-title::before { content: ''; display: inline-block; width: 30px; height: 30px; background: #f4a460; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
-        .product-list { display: flex; flex-direction: column; gap: 15px; }
-        .product { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 12px; }
-        .product-checkbox { width: 20px; height: 20px; border: 2px solid #e084d9; border-radius: 50%; margin-right: 15px; flex-shrink: 0; cursor: pointer; }
-        .product-checkbox.checked { background: #e084d9; }
-        .product-info { flex: 1; }
-        .product-name { font-weight: 600; color: #333; margin-bottom: 4px; }
-        .product-brand { font-size: 12px; color: #999; }
-        .product-image { width: 40px; height: 40px; background: #e084d9; border-radius: 8px; margin-left: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
-        .nav { display: flex; justify-content: space-around; padding: 20px; background: #f9f9f9; border-top: 1px solid #eee; }
-        .nav-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-size: 24px; }
-        .nav-icon:hover { background: #ede9fe; }
-        .nav-icon.active { color: #e084d9; }
-    </style>
+<title>SkinCycling Coach</title>
+<style>
+body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f4a460, #e084d9, #7db8a8); min-height: 100vh; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; }
+.container { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.header { text-align: center; margin-bottom: 30px; }
+.header h1 { font-size: 32px; margin: 0; color: #333; }
+.header .pink { color: #e084d9; }
+.header p { font-size: 14px; color: #999; margin-top: 10px; }
+.date { color: #f4a460; font-size: 12px; font-weight: bold; margin-bottom: 20px; }
+.badge { background: #f4a460; color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+.title { font-size: 28px; font-weight: bold; margin-bottom: 30px; }
+.products { list-style: none; padding: 0; margin: 0; }
+.product { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 12px; margin-bottom: 15px; cursor: pointer; }
+.product input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; accent-color: #e084d9; }
+.product-info { flex: 1; }
+.product-name { font-weight: bold; color: #333; }
+.product-brand { font-size: 12px; color: #999; margin-top: 4px; }
+.nav { display: flex; justify-content: space-around; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+.nav-item { font-size: 24px; cursor: pointer; }
+</style>
 </head>
 <body>
-    <div class="app">
-        <div class="header">
-            <h1>Ciao, <span class="pink">Beauty</span></h1>
-            <p>La tua routine skincare personalizzata</p>
-        </div>
-        <div class="content">
-            <div class="date">SABATO 29 NOVEMBRE</div>
-            <div class="cycle-badge">🌙 NOTTE 1 / 4</div>
-            <div class="greeting">Serata relax per la tua <span class="pink">pelle.</span></div>
-            
-            <div class="routine-title">Rituale Mattina</div>
-            <div class="product-list">
-                <div class="product">
-                    <div class="product-checkbox"></div>
-                    <div class="product-info">
-                        <div class="product-name">Detersione</div>
-                        <div class="product-brand">Hydro Boost Aqua Gel</div>
-                    </div>
-                    <div class="product-image">💧</div>
-                </div>
-                <div class="product">
-                    <div class="product-checkbox"></div>
-                    <div class="product-info">
-                        <div class="product-name">Siero</div>
-                        <div class="product-brand">Multi-Peptide + HA Serum</div>
-                    </div>
-                    <div class="product-image">✨</div>
-                </div>
-                <div class="product">
-                    <div class="product-checkbox"></div>
-                    <div class="product-info">
-                        <div class="product-name">Crema</div>
-                        <div class="product-brand">LiftActiv Collagen Specialist</div>
-                    </div>
-                    <div class="product-image">🧴</div>
-                </div>
-                <div class="product">
-                    <div class="product-checkbox"></div>
-                    <div class="product-info">
-                        <div class="product-name">SPF</div>
-                        <div class="product-brand">Anthelios UVMUNE 400 SPF 50+</div>
-                    </div>
-                    <div class="product-image">☀️</div>
-                </div>
-            </div>
-        </div>
-        <div class="nav">
-            <div class="nav-icon active">📋</div>
-            <div class="nav-icon">📅</div>
-            <div class="nav-icon">💄</div>
-            <div class="nav-icon">⚙️</div>
-        </div>
-    </div>
-    
-    <script>
-        document.querySelectorAll('.product-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('click', function() {
-                this.classList.toggle('checked');
-            });
-        });
-    </script>
+<div class="container">
+<div class="header">
+<h1>Ciao, <span class="pink">Beauty</span></h1>
+<p>La tua routine skincare personalizzata</p>
+</div>
+<div class="date">SABATO 29 NOVEMBRE</div>
+<div class="badge">🌙 NOTTE 1 / 4</div>
+<div class="title">Serata relax per la tua <span class="pink">pelle.</span></div>
+<h2 style="font-size: 18px; margin-top: 30px; margin-bottom: 20px; color: #333;">☀️ Rituale Mattina</h2>
+<ul class="products">
+<li class="product"><input type="checkbox"><div class="product-info"><div class="product-name">Detersione</div><div class="product-brand">Hydro Boost Aqua Gel</div></div></li>
+<li class="product"><input type="checkbox"><div class="product-info"><div class="product-name">Siero</div><div class="product-brand">Multi-Peptide + HA Serum</div></div></li>
+<li class="product"><input type="checkbox"><div class="product-info"><div class="product-name">Crema</div><div class="product-brand">LiftActiv Collagen Specialist</div></div></li>
+<li class="product"><input type="checkbox"><div class="product-info"><div class="product-name">SPF</div><div class="product-brand">Anthelios UVMUNE 400 SPF 50+</div></div></li>
+</ul>
+<div class="nav">
+<div class="nav-item">📋</div>
+<div class="nav-item">📅</div>
+<div class="nav-item">💄</div>
+<div class="nav-item">⚙️</div>
+</div>
+</div>
 </body>
 </html>
