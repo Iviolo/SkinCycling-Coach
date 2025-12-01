@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save, Trash2, Plus, GripVertical, Eye, EyeOff } from 'lucide-react';
 import { RoutineSettings, RoutineStep, CycleNightConfig } from '../types';
 import { getRoutineSettings, saveRoutineSettings } from '../services/storageService';
+import { NIGHT_COLORS } from '../constants';
 
 interface SettingsViewProps {
   onBack: () => void;
@@ -79,9 +80,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
 
   const getNightColor = (index: number) => {
       // 0=night1(orange), 1=night2(pink), 2=night3(green), 3=night4(green)
-      if (index === 0) return '#f4a460';
-      if (index === 1) return '#e084d9';
-      return '#7db8a8';
+      if (index === 0) return NIGHT_COLORS.night_1;
+      if (index === 1) return NIGHT_COLORS.night_2;
+      return NIGHT_COLORS.night_3_4;
   };
 
   if (!settings) return <div className="p-10 text-center">Caricamento...</div>;

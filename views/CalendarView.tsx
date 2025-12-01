@@ -4,6 +4,7 @@ import it from 'date-fns/locale/it';
 import { getLogs, getStartDate, getRoutineSettings } from '../services/storageService';
 import { Check, X, Zap, Droplet, Sparkles, Leaf, ChevronUp } from 'lucide-react';
 import { RoutineSettings, DailyLog } from '../types';
+import { NIGHT_COLORS } from '../constants';
 
 // Helpers to replace missing/problematic exports
 const parseISO = (dateStr: string) => {
@@ -44,9 +45,9 @@ const CalendarView: React.FC = () => {
 
   const getCycleIcon = (nightNum: number) => {
       // 1: Orange, 2: Pink, 3,4: Green
-      if (nightNum === 1) return <Droplet size={10} style={{color: '#f4a460'}} fill="currentColor" fillOpacity={0.2} />; 
-      if (nightNum === 2) return <Sparkles size={10} style={{color: '#e084d9'}} fill="currentColor" fillOpacity={0.2} />; 
-      return <Leaf size={10} style={{color: '#7db8a8'}} fill="currentColor" fillOpacity={0.2} />; 
+      if (nightNum === 1) return <Droplet size={10} style={{color: NIGHT_COLORS.night_1}} fill="currentColor" fillOpacity={0.2} />; 
+      if (nightNum === 2) return <Sparkles size={10} style={{color: NIGHT_COLORS.night_2}} fill="currentColor" fillOpacity={0.2} />; 
+      return <Leaf size={10} style={{color: NIGHT_COLORS.night_3_4}} fill="currentColor" fillOpacity={0.2} />; 
   };
 
   const calculateStats = () => {
@@ -109,20 +110,20 @@ const CalendarView: React.FC = () => {
              const log = logs[dateStr];
              const info = getCycleInfo(day);
              
-             // Bubble Styling with explicit Hex
+             // Bubble Styling with explicit Hex from Constants
              let bubbleBgStyle = { backgroundColor: '#f9fafb' }; // Default stone-50
              let bubbleBorderStyle = { borderColor: 'transparent' };
 
-             if (info?.index === 1) bubbleBgStyle = { backgroundColor: 'rgba(244, 164, 96, 0.1)' }; // Orange/10
-             if (info?.index === 2) bubbleBgStyle = { backgroundColor: 'rgba(224, 132, 217, 0.1)' }; // Pink/10
-             if (info?.index === 3 || info?.index === 4) bubbleBgStyle = { backgroundColor: 'rgba(125, 184, 168, 0.1)' }; // Green/10
+             if (info?.index === 1) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_1}1A` }; // 10% opacity
+             if (info?.index === 2) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_2}1A` }; 
+             if (info?.index === 3 || info?.index === 4) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_3_4}1A` }; 
 
              // Completion Status
              const isDone = log?.pmCompleted;
              if (isDone) {
-                 if (info?.index === 1) bubbleBorderStyle = { borderColor: '#f4a460' };
-                 else if (info?.index === 2) bubbleBorderStyle = { borderColor: '#e084d9' };
-                 else bubbleBorderStyle = { borderColor: '#7db8a8' };
+                 if (info?.index === 1) bubbleBorderStyle = { borderColor: NIGHT_COLORS.night_1 };
+                 else if (info?.index === 2) bubbleBorderStyle = { borderColor: NIGHT_COLORS.night_2 };
+                 else bubbleBorderStyle = { borderColor: NIGHT_COLORS.night_3_4 };
              }
 
              return (

@@ -4,7 +4,7 @@ import { format, differenceInDays } from 'date-fns';
 import it from 'date-fns/locale/it';
 import { getLogs, saveLog, getStartDate, getRoutineSettings, getProducts } from '../services/storageService';
 import { DailyLog, RoutineSettings, CycleNightConfig, RoutineStep, Product } from '../types';
-import { INITIAL_PRODUCTS } from '../constants';
+import { INITIAL_PRODUCTS, NIGHT_COLORS } from '../constants';
 
 interface TodayViewProps {
   onOpenSettings: () => void;
@@ -21,18 +21,18 @@ interface StepCardProps {
     checked: boolean;
     onClick: () => void;
     imageUrl?: string;
-    customColorClass?: string;
+    customColor?: string;
 }
 
-const StepCard: React.FC<StepCardProps> = ({ step, checked, onClick, imageUrl, customColorClass }) => {
+const StepCard: React.FC<StepCardProps> = ({ step, checked, onClick, imageUrl, customColor }) => {
     // Default color logic for AM if no custom class is passed
     const getStepColor = (label: string) => {
         const l = label.toLowerCase();
-        if (l.includes('spf')) return 'bg-amber-200';
-        return 'bg-stone-200';
+        if (l.includes('spf')) return '#fde047'; // amber-200
+        return '#e7e5e4'; // stone-200
     };
 
-    const barColor = customColorClass || getStepColor(step.label);
+    const barColor = customColor || getStepColor(step.label);
 
     return (
         <div 
@@ -40,10 +40,10 @@ const StepCard: React.FC<StepCardProps> = ({ step, checked, onClick, imageUrl, c
             className={`relative overflow-hidden bg-white rounded-2xl p-3 pr-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-stone-50 flex items-center gap-4 transition-all duration-300 active:scale-[0.98] ${checked ? 'opacity-60 grayscale-[0.5]' : ''}`}
         >
             {/* Color Strip */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${barColor}`} />
+            <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: barColor }} />
 
             <div className={`w-6 h-6 rounded-full border-2 flex shrink-0 items-center justify-center transition-all duration-300 ml-2 ${checked ? 'bg-emerald-400 border-emerald-400' : 'border-stone-200 bg-stone-50'}`}>
-                {checked && <Check size={14} className="text-white animate-pop-bounce" />}
+                {checked && <Check size={14} className="text-white animate-bounce-custom" />}
             </div>
 
             {/* Product Image */}
@@ -160,49 +160,28 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
   const heroIcon = isNightTime ? <Moon strokeWidth={1} size={48} className="text-rose-300" /> : <Sun strokeWidth={1} size={48} className="text-amber-300" />;
   const motivation = isNightTime ? "Serata relax per la tua pelle." : "Pelle coccolata e protetta oggi.";
 
-  // Specific Colors Hex
-  const colors = {
-      orange: '#f4a460',
-      pink: '#e084d9',
-      green: '#7db8a8'
-  };
-
-  // Cycle Night Colors
+  // Cycle Night Colors Logic
   const getThemeHex = (theme: string) => {
       switch(theme) {
-          case 'orange': return colors.orange;
-          case 'pink': return colors.pink;
-          default: return colors.green;
+          case 'orange': return NIGHT_COLORS.night_1;
+          case 'pink': return NIGHT_COLORS.night_2;
+          default: return NIGHT_COLORS.night_3_4;
       }
   };
   
   const themeHex = getThemeHex(activeCycleNight.colorTheme);
-  
-  // Tailwind arbitrary values for Badge
-  const getBadgeClass = (theme: string) => {
-     switch(theme) {
-         case 'orange': return 'bg-[#f4a460]/10 text-[#f4a460] border-[#f4a460]/20';
-         case 'pink': return 'bg-[#e084d9]/10 text-[#e084d9] border-[#e084d9]/20';
-         case 'green': return 'bg-[#7db8a8]/10 text-[#7db8a8] border-[#7db8a8]/20';
-         default: return 'bg-stone-100 text-stone-600 border-stone-200';
-     }
-  };
-  const badgeClass = getBadgeClass(activeCycleNight.colorTheme);
-
-  // Side bar color for PM steps
-  const pmStepBarClass = `bg-[${themeHex}]`;
 
   return (
     <div className="pt-8 pb-32 px-5 max-w-md mx-auto space-y-8">
       {/* Inject Keyframes */}
       <style>{`
-        @keyframes pop-bounce {
+        @keyframes bounce {
           0% { transform: scale(1); }
           50% { transform: scale(1.2); }
           100% { transform: scale(1); }
         }
-        .animate-pop-bounce {
-          animation: pop-bounce 0.4s ease-in-out;
+        .animate-bounce-custom {
+          animation: bounce 0.4s ease-in-out;
         }
       `}</style>
 
@@ -232,9 +211,17 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
                 {heroIcon}
             </div>
             <div>
-                <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 border ${badgeClass}`}>
+                {/* Badge using the themeHex directly */}
+                <div 
+                    className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 border"
+                    style={{ 
+                        backgroundColor: `${themeHex}1A`, // 10% opacity 
+                        color: themeHex, 
+                        borderColor: `${themeHex}33` // 20% opacity
+                    }}
+                >
                     Notte {currentNightIndex} / {cycleLength}
-                </span>
+                </div>
                 <h2 className="text-xl font-nunito font-bold text-stone-700 leading-tight">
                     {motivation}
                 </h2>
@@ -308,7 +295,7 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
                     checked={pmChecks.has(step.id)} 
                     onClick={() => !todayLog?.pmCompleted && toggleCheck(step.id, 'PM')} 
                     imageUrl={getProductImage(step.productName)}
-                    customColorClass={pmStepBarClass}
+                    customColor={themeHex}
                  />
              ))}
           </div>

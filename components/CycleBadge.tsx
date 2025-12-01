@@ -1,19 +1,24 @@
 import React from 'react';
+import { NIGHT_COLORS } from '../constants';
 
 interface CycleBadgeProps {
   night: number;
 }
 
 const CycleBadge: React.FC<CycleBadgeProps> = ({ night }) => {
-  // Orange #f4a460, Pink #e084d9, Green #7db8a8
-  const colors = {
-    1: 'bg-[#f4a460]/10 text-[#f4a460] border-[#f4a460]/20', // Night 1 - Orange
-    2: 'bg-[#e084d9]/10 text-[#e084d9] border-[#e084d9]/20', // Night 2 - Pink
-    3: 'bg-[#7db8a8]/10 text-[#7db8a8] border-[#7db8a8]/20', // Night 3 - Green
-    4: 'bg-[#7db8a8]/10 text-[#7db8a8] border-[#7db8a8]/20', // Night 4 - Green
+  // Map night number to hex color
+  // Night 1: Orange, Night 2: Pink, Night 3/4: Green
+  const getColor = (n: number) => {
+      switch(n) {
+          case 1: return NIGHT_COLORS.night_1;
+          case 2: return NIGHT_COLORS.night_2;
+          default: return NIGHT_COLORS.night_3_4;
+      }
   };
 
-  const labels = {
+  const color = getColor(night);
+
+  const labels: Record<number, string> = {
     1: 'Esfoliazione',
     2: 'Retinoide',
     3: 'Recupero',
@@ -21,8 +26,15 @@ const CycleBadge: React.FC<CycleBadgeProps> = ({ night }) => {
   };
 
   return (
-    <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${colors[night as keyof typeof colors] || colors[4]}`}>
-      Notte {night}: {labels[night as keyof typeof labels]}
+    <div 
+        className="px-3 py-1 rounded-full text-xs font-semibold border"
+        style={{ 
+            backgroundColor: `${color}1A`, // 10% opacity (approx hex 1A)
+            color: color, 
+            borderColor: `${color}33` // 20% opacity (approx hex 33)
+        }}
+    >
+      Notte {night}: {labels[night] || labels[4]}
     </div>
   );
 };

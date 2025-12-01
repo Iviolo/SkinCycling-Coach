@@ -1,5 +1,11 @@
 import { Product, RoutineSettings } from './types';
 
+export const NIGHT_COLORS = {
+  night_1: '#f4a460', // Arancione
+  night_2: '#e084d9', // Rosa
+  night_3_4: '#7db8a8' // Verde
+};
+
 export const INITIAL_PRODUCTS: Product[] = [
   {
     id: '1',
