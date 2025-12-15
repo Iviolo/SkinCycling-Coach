@@ -14,10 +14,6 @@ const App: React.FC = () => {
   const handleOpenSettings = () => setActiveOverlay('settings');
   const handleCloseSettings = () => setActiveOverlay('none');
 
-  if (activeOverlay === 'settings') {
-    return <SettingsView onBack={handleCloseSettings} />;
-  }
-
   const renderView = () => {
     switch (currentTab) {
       case 'today':
@@ -34,12 +30,34 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCF8] text-stone-700 antialiased selection:bg-rose-100">
-      <main className="h-full pb-20">
-        {renderView()}
-      </main>
-      <Navbar currentTab={currentTab} setTab={setCurrentTab} />
-    </div>
+    <>
+      {/* GLOBAL BACKGROUND 
+          Fixed position ensures it never scrolls. 
+          z-index -1 ensures it stays behind all content.
+      */}
+      <div 
+        className="fixed inset-0 z-[-1] bg-no-repeat bg-center bg-cover"
+        style={{
+          backgroundImage: "url('https://i.pinimg.com/736x/bb/13/99/bb13992b3fe41f8ea010c02fec133987.jpg')",
+          width: '100vw',
+          height: '100vh'
+        }}
+      />
+      
+      {/* Content Wrapper */}
+      <div className="min-h-screen text-stone-700 antialiased selection:bg-rose-100 relative z-0">
+        {activeOverlay === 'settings' ? (
+          <SettingsView onBack={handleCloseSettings} />
+        ) : (
+          <>
+            <main className="h-full pb-20">
+              {renderView()}
+            </main>
+            <Navbar currentTab={currentTab} setTab={setCurrentTab} />
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

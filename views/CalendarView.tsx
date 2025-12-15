@@ -63,17 +63,13 @@ const CalendarView: React.FC = () => {
     let tempDate = today;
     
     // Check backwards from today for streak
-    // Using a loop for max 365 days to be safe
     for(let i = 0; i < 365; i++) {
         const dStr = format(tempDate, 'yyyy-MM-dd');
         const l = logs[dStr];
-        // Streak counts if at least one routine (AM or PM) was done? Or strictly PM? 
-        // Let's say if PM completed -> strict skincare.
         if (l && l.pmCompleted) {
             currentStreak++;
             tempDate = subDays(tempDate, 1);
         } else if (isSameDay(tempDate, today) && (!l || !l.pmCompleted)) {
-            // If today is not done yet, don't break streak immediately, check yesterday
             tempDate = subDays(tempDate, 1);
         } else {
             break;
@@ -107,14 +103,14 @@ const CalendarView: React.FC = () => {
 
   return (
     <div className="pb-24 pt-6 px-4 max-w-md mx-auto h-screen overflow-y-auto no-scrollbar relative">
-       <div className="flex items-center gap-3 mb-6 pl-2">
-            <BarChart2 className="text-stone-300" size={24} />
-            <h1 className="text-2xl font-nunito font-bold text-stone-800">Analisi</h1>
+       <div className="flex items-center gap-3 mb-6 pl-2 drop-shadow-sm">
+            <BarChart2 className="text-stone-700" size={24} />
+            <h1 className="text-2xl font-nunito font-bold text-stone-900">Analisi</h1>
        </div>
 
        {/* NEW: Weekly Activity Graph */}
-       <div className="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-stone-50 mb-6">
-           <h3 className="font-nunito font-bold text-stone-700 mb-6">Ultimi 7 Giorni</h3>
+       <div className="bg-white/30 backdrop-blur-md rounded-[2rem] p-6 shadow-xl border border-white/30 mb-6">
+           <h3 className="font-nunito font-bold text-stone-800 mb-6">Ultimi 7 Giorni</h3>
            <div className="flex justify-between items-end h-32 px-2">
                {last7Days.map((day) => {
                    const dateStr = format(day, 'yyyy-MM-dd');
@@ -124,7 +120,6 @@ const CalendarView: React.FC = () => {
                    const dayLabel = format(day, 'EEEE', {locale: it}).charAt(0).toUpperCase();
                    const info = getCycleInfo(day);
                    
-                   // Determine color for PM bar based on cycle
                    let pmColor = '#e7e5e4'; // default stone
                    if (isPmDone && info) {
                        if (info.index === 1) pmColor = NIGHT_COLORS.night_1;
@@ -138,15 +133,15 @@ const CalendarView: React.FC = () => {
                            <div className="flex flex-col gap-1 w-2.5">
                                {/* PM Bar (Top) */}
                                <div 
-                                    className={`w-full rounded-full transition-all duration-500 ${isPmDone ? 'h-14 opacity-100' : 'h-1 opacity-20 bg-stone-200'}`} 
+                                    className={`w-full rounded-full transition-all duration-500 ${isPmDone ? 'h-14 opacity-100' : 'h-1 opacity-20 bg-stone-300'}`} 
                                     style={{ backgroundColor: isPmDone ? pmColor : undefined }}
                                />
                                {/* AM Bar (Bottom) */}
                                <div 
-                                    className={`w-full bg-amber-300 rounded-full transition-all duration-500 ${isAmDone ? 'h-10 opacity-100' : 'h-1 opacity-20 bg-stone-200'}`} 
+                                    className={`w-full bg-amber-300 rounded-full transition-all duration-500 ${isAmDone ? 'h-10 opacity-100' : 'h-1 opacity-20 bg-stone-300'}`} 
                                />
                            </div>
-                           <span className={`text-[10px] font-bold ${isSameDay(day, today) ? 'text-stone-800' : 'text-stone-300'}`}>{dayLabel}</span>
+                           <span className={`text-[10px] font-bold ${isSameDay(day, today) ? 'text-stone-900' : 'text-stone-500'}`}>{dayLabel}</span>
                        </div>
                    )
                })}
@@ -154,47 +149,47 @@ const CalendarView: React.FC = () => {
            <div className="flex items-center justify-center gap-4 mt-6">
                <div className="flex items-center gap-1.5">
                    <div className="w-2 h-2 rounded-full bg-amber-300"></div>
-                   <span className="text-[10px] text-stone-400 font-bold uppercase">Mattina</span>
+                   <span className="text-[10px] text-stone-700 font-bold uppercase">Mattina</span>
                </div>
                <div className="flex items-center gap-1.5">
                    <div className="w-2 h-2 rounded-full bg-stone-800"></div>
-                   <span className="text-[10px] text-stone-400 font-bold uppercase">Sera</span>
+                   <span className="text-[10px] text-stone-700 font-bold uppercase">Sera</span>
                </div>
            </div>
        </div>
 
        {/* Detailed Stats Grid */}
        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-3xl border border-stone-50 shadow-sm relative overflow-hidden">
+          <div className="bg-white/30 backdrop-blur-md p-5 rounded-3xl border border-white/30 shadow-lg relative overflow-hidden">
               <div className="absolute right-0 top-0 p-4 opacity-5">
                   <Flame size={60} />
               </div>
               <div className="relative z-10">
                   <span className="text-3xl font-nunito font-bold text-stone-800">{stats.streak}</span>
-                  <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Giorni Streak</p>
+                  <p className="text-[10px] uppercase tracking-widest text-stone-700 font-bold mt-1">Giorni Streak</p>
               </div>
           </div>
           
-          <div className="bg-white p-5 rounded-3xl border border-stone-50 shadow-sm relative overflow-hidden">
+          <div className="bg-white/30 backdrop-blur-md p-5 rounded-3xl border border-white/30 shadow-lg relative overflow-hidden">
               <div className="absolute right-0 top-0 p-4 opacity-5">
                   <Layers size={60} />
               </div>
               <div className="relative z-10">
                   <span className="text-3xl font-nunito font-bold text-stone-800">{stats.totalSessions}</span>
-                  <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Routine Totali</p>
+                  <p className="text-[10px] uppercase tracking-widest text-stone-700 font-bold mt-1">Routine Totali</p>
               </div>
           </div>
        </div>
 
        {/* Calendar Card (Monthly View) */}
-       <div className="bg-white rounded-[2rem] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-stone-50 mb-8">
-         <div className="text-center font-nunito font-bold text-lg capitalize text-stone-700 mb-6">
+       <div className="bg-white/30 backdrop-blur-md rounded-[2rem] p-5 shadow-xl border border-white/30 mb-8">
+         <div className="text-center font-nunito font-bold text-lg capitalize text-stone-800 mb-6">
             {format(today, 'MMMM yyyy', { locale: it })}
          </div>
 
          <div className="grid grid-cols-7 gap-y-4 mb-2">
             {['L', 'M', 'M', 'G', 'V', 'S', 'D'].map((d, i) => (
-              <div key={i} className="text-center text-[10px] text-stone-400 font-bold tracking-widest">
+              <div key={i} className="text-center text-[10px] text-stone-600 font-bold tracking-widest">
                 {d}
               </div>
             ))}
@@ -209,13 +204,13 @@ const CalendarView: React.FC = () => {
              const log = logs[dateStr];
              const info = getCycleInfo(day);
              
-             // Bubble Styling with explicit Hex from Constants
-             let bubbleBgStyle = { backgroundColor: '#f9fafb' }; // Default stone-50
+             // Bubble Styling
+             let bubbleBgStyle = { backgroundColor: 'rgba(255,255,255,0.2)' }; 
              let bubbleBorderStyle = { borderColor: 'transparent' };
 
-             if (info?.index === 1) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_1}1A` }; // 10% opacity
-             if (info?.index === 2) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_2}1A` }; 
-             if (info?.index === 3 || info?.index === 4) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_3_4}1A` }; 
+             if (info?.index === 1) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_1}30` }; 
+             if (info?.index === 2) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_2}30` }; 
+             if (info?.index === 3 || info?.index === 4) bubbleBgStyle = { backgroundColor: `${NIGHT_COLORS.night_3_4}30` }; 
 
              // Completion Status
              const isDone = log?.pmCompleted;
@@ -234,9 +229,9 @@ const CalendarView: React.FC = () => {
                      `}
                      style={{ ...bubbleBgStyle, ...bubbleBorderStyle }}
                    >
-                     <span className={`text-xs font-semibold ${isDone ? 'text-stone-800' : 'text-stone-400'}`}>{format(day, 'd')}</span>
+                     <span className={`text-xs font-semibold ${isDone ? 'text-stone-900' : 'text-stone-700'}`}>{format(day, 'd')}</span>
                      {/* Mini Icon */}
-                     <div className="absolute -bottom-1.5 bg-white rounded-full p-0.5 shadow-sm border border-stone-50">
+                     <div className="absolute -bottom-1.5 bg-white/80 backdrop-blur-sm rounded-full p-0.5 shadow-sm border border-stone-100">
                         {info && getCycleIcon(info.index)}
                      </div>
                    </div>
@@ -254,40 +249,40 @@ const CalendarView: React.FC = () => {
            
            return (
              <>
-               <div className="fixed inset-0 bg-stone-900/20 backdrop-blur-sm z-50 transition-opacity" onClick={() => setSelectedDay(null)} />
-               <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl rounded-t-[2.5rem] p-8 pb-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50 animate-slide-up max-w-md mx-auto">
-                   <div className="w-12 h-1 bg-stone-200 rounded-full mx-auto mb-6" />
+               <div className="fixed inset-0 bg-stone-900/30 backdrop-blur-sm z-50 transition-opacity" onClick={() => setSelectedDay(null)} />
+               <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl rounded-t-[2.5rem] p-8 pb-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50 animate-slide-up max-w-md mx-auto border-t border-white/30">
+                   <div className="w-12 h-1 bg-stone-400 rounded-full mx-auto mb-6" />
                    
                    <div className="flex justify-between items-start mb-6">
                        <div>
-                           <h3 className="text-2xl font-nunito font-bold text-stone-800 capitalize">
+                           <h3 className="text-2xl font-nunito font-bold text-stone-900 capitalize">
                                {format(selectedDay, 'EEEE d MMMM', { locale: it })}
                            </h3>
                            <div className="flex items-center gap-2 mt-2">
                                {info && getCycleIcon(info.index)}
-                               <span className="text-sm text-stone-500 font-medium">Notte {info?.index}: {info?.config.title}</span>
+                               <span className="text-sm text-stone-700 font-medium">Notte {info?.index}: {info?.config.title}</span>
                            </div>
                        </div>
-                       <button onClick={() => setSelectedDay(null)} className="p-2 bg-stone-100 rounded-full text-stone-400">
+                       <button onClick={() => setSelectedDay(null)} className="p-2 bg-stone-200/50 rounded-full text-stone-600">
                            <X size={20} />
                        </button>
                    </div>
 
                    <div className="space-y-4">
-                       <div className={`p-4 rounded-2xl border flex items-center justify-between ${log?.amCompleted ? 'bg-amber-50 border-amber-100' : 'bg-stone-50 border-stone-100'}`}>
-                           <span className="text-sm font-bold text-stone-600">Routine Mattina (SPF)</span>
-                           {log?.amCompleted ? <Check className="text-amber-500" size={20} /> : <span className="text-xs text-stone-400">Non fatta</span>}
+                       <div className={`p-4 rounded-2xl border flex items-center justify-between ${log?.amCompleted ? 'bg-amber-100/50 border-amber-200/50' : 'bg-white/40 border-white/40'}`}>
+                           <span className="text-sm font-bold text-stone-700">Routine Mattina (SPF)</span>
+                           {log?.amCompleted ? <Check className="text-amber-500" size={20} /> : <span className="text-xs text-stone-500">Non fatta</span>}
                        </div>
-                       <div className={`p-4 rounded-2xl border flex items-center justify-between ${log?.pmCompleted ? 'bg-rose-50 border-rose-100' : 'bg-stone-50 border-stone-100'}`}>
-                           <span className="text-sm font-bold text-stone-600">Routine Sera</span>
-                           {log?.pmCompleted ? <Check className="text-rose-400" size={20} /> : <span className="text-xs text-stone-400">Non fatta</span>}
+                       <div className={`p-4 rounded-2xl border flex items-center justify-between ${log?.pmCompleted ? 'bg-rose-100/50 border-rose-200/50' : 'bg-white/40 border-white/40'}`}>
+                           <span className="text-sm font-bold text-stone-700">Routine Sera</span>
+                           {log?.pmCompleted ? <Check className="text-rose-400" size={20} /> : <span className="text-xs text-stone-500">Non fatta</span>}
                        </div>
                    </div>
 
                    {log?.notes && (
                        <div className="mt-6">
-                           <h4 className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Note Pelle</h4>
-                           <p className="text-sm text-stone-600 italic bg-stone-50 p-3 rounded-xl border border-stone-100">"{log.notes}"</p>
+                           <h4 className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Note Pelle</h4>
+                           <p className="text-sm text-stone-700 italic bg-white/40 p-3 rounded-xl border border-white/40">"{log.notes}"</p>
                        </div>
                    )}
                </div>

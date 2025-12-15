@@ -66,27 +66,27 @@ const StepCard: React.FC<StepCardProps> = ({ step, checked, onClick, imageUrl, c
     return (
         <div 
             onClick={!disabled ? onClick : undefined}
-            className={`relative overflow-hidden bg-white rounded-2xl p-3 pr-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-stone-50 flex items-center gap-4 transition-all duration-300 ${!disabled ? 'active:scale-[0.98]' : ''} ${checked ? 'opacity-60 grayscale-[0.5]' : ''}`}
+            className={`relative overflow-hidden bg-white/30 backdrop-blur-md rounded-2xl p-3 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-white/30 flex items-center gap-4 transition-all duration-300 ${!disabled ? 'active:scale-[0.98] hover:bg-white/40' : ''} ${checked ? 'opacity-60 grayscale-[0.5]' : ''}`}
         >
             <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: barColor }} />
 
-            <div className={`w-6 h-6 rounded-full border-2 flex shrink-0 items-center justify-center transition-all duration-300 ml-2 ${checked ? 'bg-emerald-400 border-emerald-400' : 'border-stone-200 bg-stone-50'}`}>
+            <div className={`w-6 h-6 rounded-full border-2 flex shrink-0 items-center justify-center transition-all duration-300 ml-2 ${checked ? 'bg-emerald-400 border-emerald-400' : 'border-white/50 bg-white/20'}`}>
                 {checked && <Check size={14} className="text-white animate-bounce-custom" />}
             </div>
 
-            <div className="w-12 h-12 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-12 h-12 rounded-lg bg-white/30 border border-white/40 flex items-center justify-center overflow-hidden shrink-0">
                 {imageUrl ? (
                     <img src={imageUrl} alt={step.productName} className="w-full h-full object-cover" />
                 ) : (
-                    <span className="text-xs text-stone-300 font-serif italic opacity-50">{step.label.charAt(0)}</span>
+                    <span className="text-xs text-stone-600 font-serif italic opacity-70">{step.label.charAt(0)}</span>
                 )}
             </div>
 
             <div className="flex-1 min-w-0">
-                <h4 className={`font-nunito font-bold text-base text-stone-700 truncate ${checked ? 'line-through text-stone-400' : ''}`}>
+                <h4 className={`font-nunito font-bold text-base text-stone-800 drop-shadow-sm truncate ${checked ? 'line-through text-stone-500' : ''}`}>
                     {step.label}
                 </h4>
-                {step.productName && <p className="text-xs text-stone-400 font-light mt-0.5 tracking-wide truncate">{step.productName}</p>}
+                {step.productName && <p className="text-xs text-stone-700 font-medium mt-0.5 tracking-wide truncate drop-shadow-sm">{step.productName}</p>}
             </div>
         </div>
     );
@@ -132,7 +132,6 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
       if (logs[todayStr].amCompleted) {
         setAmChecks(new Set(storedSettings.amRoutine.map(s => s.id)));
       } else {
-         // Reset checks if not completed, so you can start over
          setAmChecks(new Set());
       }
 
@@ -179,7 +178,6 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
       const newLog = { ...todayLog };
       
       if (!isComplete) {
-          // Marking as Complete
           if (type === 'AM') newLog.amCompleted = true;
           else newLog.pmCompleted = true;
           newLog.cycleDay = currentNightIndex;
@@ -187,7 +185,6 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
           setCelebration(type);
           setTimeout(() => setCelebration(null), 4000);
       } else {
-          // Undoing (Reopening)
           if (type === 'AM') newLog.amCompleted = false;
           else newLog.pmCompleted = false;
       }
@@ -254,10 +251,10 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
         }
       `}</style>
 
-      {/* Celebration Overlay - Z-INDEX 60 to appear above navbar */}
+      {/* Celebration Overlay */}
       {celebration && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-[2.5rem] p-10 text-center shadow-2xl relative overflow-hidden w-full max-w-sm animate-bounce-custom transform">
+            <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-10 text-center shadow-2xl relative overflow-hidden w-full max-w-sm animate-bounce-custom transform border border-white/50">
                 <FireworkParticles />
                 <div className="relative z-10">
                     <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
@@ -276,15 +273,15 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
 
       {/* Header */}
       <div className="flex justify-between items-start">
-        <div>
-           <p className="text-stone-400 text-xs font-semibold uppercase tracking-widest mb-1">
+        <div className="drop-shadow-sm">
+           <p className="text-stone-700 text-xs font-semibold uppercase tracking-widest mb-1 shadow-black/10">
              {format(new Date(), 'EEEE d MMMM', { locale: it })}
            </p>
-           <h1 className="text-3xl font-nunito font-bold text-stone-800 tracking-tight">
-             Ciao, <span className="text-rose-400">{userName}</span>
+           <h1 className="text-3xl font-nunito font-bold text-stone-900 tracking-tight drop-shadow-sm">
+             Ciao, <span className="text-rose-600">{userName}</span>
            </h1>
         </div>
-        <button onClick={onOpenSettings} className="p-3 bg-white rounded-full shadow-sm text-stone-400 hover:text-rose-400 transition-colors">
+        <button onClick={onOpenSettings} className="p-3 bg-white/30 backdrop-blur-md rounded-full shadow-sm text-stone-800 hover:text-rose-600 transition-colors border border-white/30 hover:bg-white/50">
             <Settings strokeWidth={1.5} size={22} />
         </button>
       </div>
@@ -299,20 +296,20 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
                     key={night.id}
                     onClick={() => handleCycleSwitch(idx)}
                     className={`
-                        flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 whitespace-nowrap
+                        flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 whitespace-nowrap backdrop-blur-md
                         ${isActive 
-                            ? 'bg-stone-800 text-white border-stone-800 shadow-md shadow-stone-200 scale-[1.02]' 
-                            : 'bg-white text-stone-400 border-stone-100 hover:border-stone-200'
+                            ? 'bg-stone-800/90 text-white border-stone-800 shadow-lg scale-[1.02]' 
+                            : 'bg-white/30 text-stone-700 border-white/20 hover:bg-white/40'
                         }
                     `}
                   >
                       <div 
                         className={`w-1.5 h-1.5 rounded-full ${isActive ? 'animate-pulse' : ''}`} 
-                        style={{ backgroundColor: isActive ? color : '#d6d3d1' }}
+                        style={{ backgroundColor: isActive ? color : '#a8a29e' }}
                       />
                       <div className="flex flex-col items-start leading-none gap-0.5">
-                          <span className={`text-[8px] font-bold uppercase tracking-wider ${isActive ? 'text-stone-400' : 'text-stone-300'}`}>Notte {idx + 1}</span>
-                          <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-stone-500'}`}>{night.title}</span>
+                          <span className={`text-[8px] font-bold uppercase tracking-wider ${isActive ? 'text-stone-400' : 'text-stone-700'}`}>Notte {idx + 1}</span>
+                          <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-stone-900'}`}>{night.title}</span>
                       </div>
                   </button>
               );
@@ -320,23 +317,23 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
       </div>
 
       {/* Hero Card */}
-      <div className="relative overflow-hidden bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgba(244,63,94,0.06)] border border-rose-50/50 transition-all duration-500">
-         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-            <Sparkles size={120} className="text-rose-300" />
+      <div className="relative overflow-hidden bg-white/30 backdrop-blur-lg rounded-[2rem] p-6 shadow-lg border border-white/30 transition-all duration-500 group hover:bg-white/40">
+         <div className="absolute top-0 right-0 p-8 opacity-30 pointer-events-none">
+            <Sparkles size={120} className="text-rose-400" />
          </div>
          <div className="flex items-center gap-6 relative z-10">
-            <div className="p-4 bg-stone-50 rounded-full shadow-inner">
+            <div className="p-4 bg-white/40 rounded-full shadow-inner border border-white/30">
                 {heroIcon}
             </div>
             <div>
                 <div 
-                    className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 border"
-                    style={{ backgroundColor: `${themeHex}1A`, color: themeHex, borderColor: `${themeHex}33` }}
+                    className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 border backdrop-blur-sm"
+                    style={{ backgroundColor: `${themeHex}30`, color: themeHex, borderColor: `${themeHex}50` }}
                 >
                     Notte {currentNightIndex} / {enabledNights.length}
                 </div>
-                <h2 className="text-xl font-nunito font-bold text-stone-700 leading-tight">{motivation}</h2>
-                <p className="text-sm text-stone-400 mt-1 font-light">Focus: <span className="font-semibold text-stone-500">{activeCycleNight.description}</span></p>
+                <h2 className="text-xl font-nunito font-bold text-stone-900 leading-tight drop-shadow-sm">{motivation}</h2>
+                <p className="text-sm text-stone-700 mt-1 font-medium">Focus: <span className="font-bold text-stone-900">{activeCycleNight.description}</span></p>
             </div>
          </div>
       </div>
@@ -344,10 +341,10 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
       {/* AM Section */}
       <section>
           <div className="flex items-center gap-3 mb-4 pl-1">
-              <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
-                 <Sun size={16} className="text-amber-400" />
+              <div className="w-8 h-8 rounded-full bg-amber-100/60 backdrop-blur-sm flex items-center justify-center shadow-sm">
+                 <Sun size={16} className="text-amber-600" />
               </div>
-              <h3 className="font-nunito font-bold text-lg text-stone-700">Rituale Mattina</h3>
+              <h3 className="font-nunito font-bold text-lg text-stone-900 drop-shadow-sm">Rituale Mattina</h3>
           </div>
           
           <div className="space-y-3">
@@ -356,7 +353,6 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
                     key={step.id} 
                     step={step} 
                     checked={amChecks.has(step.id)} 
-                    // Allow toggling checks only if NOT complete. To change checks, user must click "Riapri".
                     onClick={() => !todayLog?.amCompleted && toggleCheck(step.id, 'AM')} 
                     imageUrl={getProductImage(step.productName)}
                     disabled={!!todayLog?.amCompleted}
@@ -367,12 +363,12 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
           <button 
             onClick={() => toggleCompletion('AM')}
             disabled={!todayLog?.amCompleted && amChecks.size < amSteps.length}
-            className={`w-full mt-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all duration-500 shadow-lg flex items-center justify-center gap-2 ${
+            className={`w-full mt-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all duration-500 shadow-lg flex items-center justify-center gap-2 backdrop-blur-md border ${
                 todayLog?.amCompleted
-                ? 'bg-white text-stone-400 border border-stone-200 shadow-sm hover:text-stone-600'
+                ? 'bg-white/40 text-stone-700 border-white/30 shadow-sm hover:bg-white/60'
                 : amChecks.size === amSteps.length 
-                    ? 'bg-stone-800 text-white shadow-stone-200 hover:scale-[1.02]' 
-                    : 'bg-stone-100 text-stone-300 cursor-not-allowed shadow-none'
+                    ? 'bg-stone-800/90 text-white border-transparent shadow-stone-500/30 hover:scale-[1.02]' 
+                    : 'bg-white/20 text-stone-500 cursor-not-allowed shadow-none border-white/20'
             }`}
           >
             {todayLog?.amCompleted ? (
@@ -388,10 +384,10 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
       {/* PM Section */}
       <section>
           <div className="flex items-center gap-3 mb-4 pl-1">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center`} style={{ backgroundColor: `${themeHex}20` }}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-sm`} style={{ backgroundColor: `${themeHex}40` }}>
                  <Moon size={16} style={{ color: themeHex }} />
               </div>
-              <h3 className="font-nunito font-bold text-lg text-stone-700">Rituale Sera</h3>
+              <h3 className="font-nunito font-bold text-lg text-stone-900 drop-shadow-sm">Rituale Sera</h3>
           </div>
           
           <div className="space-y-3">
@@ -411,14 +407,14 @@ const TodayView: React.FC<TodayViewProps> = ({ onOpenSettings }) => {
           <button 
             onClick={() => toggleCompletion('PM')}
             disabled={!todayLog?.pmCompleted && pmChecks.size < pmSteps.length}
-            className={`w-full mt-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all duration-500 shadow-lg flex items-center justify-center gap-2 ${
+            className={`w-full mt-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all duration-500 shadow-lg flex items-center justify-center gap-2 backdrop-blur-md border ${
                 todayLog?.pmCompleted
-                ? 'bg-white text-stone-400 border border-stone-200 shadow-sm hover:text-stone-600'
+                ? 'bg-white/40 text-stone-700 border-white/30 shadow-sm hover:bg-white/60'
                 : pmChecks.size === pmSteps.length 
-                    ? 'text-white hover:scale-[1.02]' 
-                    : 'bg-stone-100 text-stone-300 cursor-not-allowed shadow-none'
+                    ? 'text-white hover:scale-[1.02] shadow-xl border-transparent' 
+                    : 'bg-white/20 text-stone-500 cursor-not-allowed shadow-none border-white/20'
             }`}
-            style={(!todayLog?.pmCompleted && pmChecks.size === pmSteps.length) ? { backgroundColor: themeHex, boxShadow: `0 10px 30px -10px ${themeHex}80` } : {}}
+            style={(!todayLog?.pmCompleted && pmChecks.size === pmSteps.length) ? { backgroundColor: `${themeHex}E6`, boxShadow: `0 10px 30px -10px ${themeHex}80` } : {}}
           >
             {todayLog?.pmCompleted ? (
                 <>
