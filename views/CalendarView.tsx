@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { endOfMonth, eachDayOfInterval, format, isSameDay, getDay, differenceInDays, isAfter, isBefore, endOfDay } from 'date-fns';
+import { endOfMonth, eachDayOfInterval, format, isSameDay, getDay, differenceInDays, isAfter, isBefore, endOfDay, subDays, startOfDay } from 'date-fns';
 import it from 'date-fns/locale/it';
 import { getLogs, getStartDate, getRoutineSettings } from '../services/storageService';
-import { Check, X, Zap, Droplet, Sparkles, Leaf, ChevronUp } from 'lucide-react';
+import { Check, X, Zap, Droplet, Sparkles, Leaf, BarChart2, Flame, Layers } from 'lucide-react';
 import { RoutineSettings, DailyLog } from '../types';
 import { NIGHT_COLORS } from '../constants';
 
@@ -51,43 +51,142 @@ const CalendarView: React.FC = () => {
   };
 
   const calculateStats = () => {
+    // Basic Counts
     const pastDaysInMonth = daysInMonth.filter(d => isBefore(d, endOfDay(today)));
     const totalDays = pastDaysInMonth.length || 1;
     let amCount = 0;
     let pmCount = 0;
-    let night1Count = 0;
-    let night2Count = 0;
+    
+    // Streak Calculation
+    let currentStreak = 0;
+    let streakBroken = false;
+    let tempDate = today;
+    
+    // Check backwards from today for streak
+    // Using a loop for max 365 days to be safe
+    for(let i = 0; i < 365; i++) {
+        const dStr = format(tempDate, 'yyyy-MM-dd');
+        const l = logs[dStr];
+        // Streak counts if at least one routine (AM or PM) was done? Or strictly PM? 
+        // Let's say if PM completed -> strict skincare.
+        if (l && l.pmCompleted) {
+            currentStreak++;
+            tempDate = subDays(tempDate, 1);
+        } else if (isSameDay(tempDate, today) && (!l || !l.pmCompleted)) {
+            // If today is not done yet, don't break streak immediately, check yesterday
+            tempDate = subDays(tempDate, 1);
+        } else {
+            break;
+        }
+    }
 
+    // Monthly Totals
     pastDaysInMonth.forEach(day => {
         const dateStr = format(day, 'yyyy-MM-dd');
         const log = logs[dateStr];
         if (log) {
             if (log.amCompleted) amCount++;
-            if (log.pmCompleted) {
-                pmCount++;
-                if (log.cycleDay === 1) night1Count++;
-                if (log.cycleDay === 2) night2Count++;
-            }
+            if (log.pmCompleted) pmCount++;
         }
     });
 
     return {
         amPercent: Math.round((amCount / totalDays) * 100),
         pmPercent: Math.round((pmCount / totalDays) * 100),
-        night1Count,
-        night2Count
+        streak: currentStreak,
+        totalSessions: amCount + pmCount
     };
   };
 
   const stats = calculateStats();
 
+  // Weekly Graph Data (Last 7 Days)
+  const last7Days = Array.from({length: 7}, (_, i) => subDays(today, 6 - i));
+
   if (!settings) return <div className="p-10 text-center text-stone-300">Caricamento...</div>;
 
   return (
     <div className="pb-24 pt-6 px-4 max-w-md mx-auto h-screen overflow-y-auto no-scrollbar relative">
-       <h1 className="text-2xl font-nunito font-bold text-stone-800 mb-6 pl-2">Il tuo Viaggio</h1>
+       <div className="flex items-center gap-3 mb-6 pl-2">
+            <BarChart2 className="text-stone-300" size={24} />
+            <h1 className="text-2xl font-nunito font-bold text-stone-800">Analisi</h1>
+       </div>
 
-       {/* Calendar Card */}
+       {/* NEW: Weekly Activity Graph */}
+       <div className="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-stone-50 mb-6">
+           <h3 className="font-nunito font-bold text-stone-700 mb-6">Ultimi 7 Giorni</h3>
+           <div className="flex justify-between items-end h-32 px-2">
+               {last7Days.map((day) => {
+                   const dateStr = format(day, 'yyyy-MM-dd');
+                   const log = logs[dateStr];
+                   const isAmDone = log?.amCompleted;
+                   const isPmDone = log?.pmCompleted;
+                   const dayLabel = format(day, 'EEEE', {locale: it}).charAt(0).toUpperCase();
+                   const info = getCycleInfo(day);
+                   
+                   // Determine color for PM bar based on cycle
+                   let pmColor = '#e7e5e4'; // default stone
+                   if (isPmDone && info) {
+                       if (info.index === 1) pmColor = NIGHT_COLORS.night_1;
+                       else if (info.index === 2) pmColor = NIGHT_COLORS.night_2;
+                       else pmColor = NIGHT_COLORS.night_3_4;
+                   }
+
+                   return (
+                       <div key={dateStr} className="flex flex-col items-center gap-2 group">
+                           {/* Bars Container */}
+                           <div className="flex flex-col gap-1 w-2.5">
+                               {/* PM Bar (Top) */}
+                               <div 
+                                    className={`w-full rounded-full transition-all duration-500 ${isPmDone ? 'h-14 opacity-100' : 'h-1 opacity-20 bg-stone-200'}`} 
+                                    style={{ backgroundColor: isPmDone ? pmColor : undefined }}
+                               />
+                               {/* AM Bar (Bottom) */}
+                               <div 
+                                    className={`w-full bg-amber-300 rounded-full transition-all duration-500 ${isAmDone ? 'h-10 opacity-100' : 'h-1 opacity-20 bg-stone-200'}`} 
+                               />
+                           </div>
+                           <span className={`text-[10px] font-bold ${isSameDay(day, today) ? 'text-stone-800' : 'text-stone-300'}`}>{dayLabel}</span>
+                       </div>
+                   )
+               })}
+           </div>
+           <div className="flex items-center justify-center gap-4 mt-6">
+               <div className="flex items-center gap-1.5">
+                   <div className="w-2 h-2 rounded-full bg-amber-300"></div>
+                   <span className="text-[10px] text-stone-400 font-bold uppercase">Mattina</span>
+               </div>
+               <div className="flex items-center gap-1.5">
+                   <div className="w-2 h-2 rounded-full bg-stone-800"></div>
+                   <span className="text-[10px] text-stone-400 font-bold uppercase">Sera</span>
+               </div>
+           </div>
+       </div>
+
+       {/* Detailed Stats Grid */}
+       <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-white p-5 rounded-3xl border border-stone-50 shadow-sm relative overflow-hidden">
+              <div className="absolute right-0 top-0 p-4 opacity-5">
+                  <Flame size={60} />
+              </div>
+              <div className="relative z-10">
+                  <span className="text-3xl font-nunito font-bold text-stone-800">{stats.streak}</span>
+                  <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Giorni Streak</p>
+              </div>
+          </div>
+          
+          <div className="bg-white p-5 rounded-3xl border border-stone-50 shadow-sm relative overflow-hidden">
+              <div className="absolute right-0 top-0 p-4 opacity-5">
+                  <Layers size={60} />
+              </div>
+              <div className="relative z-10">
+                  <span className="text-3xl font-nunito font-bold text-stone-800">{stats.totalSessions}</span>
+                  <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Routine Totali</p>
+              </div>
+          </div>
+       </div>
+
+       {/* Calendar Card (Monthly View) */}
        <div className="bg-white rounded-[2rem] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-stone-50 mb-8">
          <div className="text-center font-nunito font-bold text-lg capitalize text-stone-700 mb-6">
             {format(today, 'MMMM yyyy', { locale: it })}
@@ -145,24 +244,6 @@ const CalendarView: React.FC = () => {
              );
            })}
          </div>
-       </div>
-
-       {/* Stats Minimal */}
-       <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white p-4 rounded-3xl border border-stone-50 shadow-sm flex flex-col items-center">
-              <span className="text-3xl font-nunito font-bold text-rose-300">{stats.pmPercent}%</span>
-              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Costanza Sera</span>
-          </div>
-          <div className="bg-white p-4 rounded-3xl border border-stone-50 shadow-sm flex flex-col items-center">
-              <div className="flex items-end gap-1">
-                <span className="text-xl font-bold text-stone-600">{stats.night1Count}</span>
-                <span className="text-xs text-stone-400 mb-1">BHA</span>
-                <span className="text-stone-300 mx-1">/</span>
-                <span className="text-xl font-bold text-stone-600">{stats.night2Count}</span>
-                <span className="text-xs text-stone-400 mb-1">Ret.</span>
-              </div>
-              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mt-1">Trattamenti</span>
-          </div>
        </div>
 
        {/* Bottom Sheet Overlay */}
