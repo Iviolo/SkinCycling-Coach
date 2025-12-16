@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   build-and-deploy:
-    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
 
     steps:
@@ -21,10 +20,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install Dependencies
-run: npm install
+        run: npm install
+
       - name: Build
         run: npm run build
 
