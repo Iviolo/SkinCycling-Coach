@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save, Trash2, Plus, GripVertical, Eye, EyeOff, ChevronDown, User, Database, Layout } from 'lucide-react';
 import { RoutineSettings, RoutineStep, CycleNightConfig, Product } from '../types';
@@ -119,7 +120,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
             <option value="">{placeholder}</option>
             {availableProducts.sort((a,b) => a.name.localeCompare(b.name)).map(p => (
                 <option key={p.id} value={p.name}>
-                    {p.brand ? `${p.brand} - ${p.name}` : p.name}
+                    {p.name}
                 </option>
             ))}
             {value && value !== "" && !availableProducts.find(p => p.name === value) && (

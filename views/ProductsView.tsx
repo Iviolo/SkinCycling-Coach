@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, AlertTriangle, Moon, Sun, Search, X, Check } from 'lucide-react';
+import { Plus, Trash2, AlertTriangle, Moon, Sun, Search, X, Check, Info, FileText, Zap } from 'lucide-react';
 import { Product, ProductType } from '../types';
 import { getProducts, saveProduct, saveProducts, addProductToRoutine, removeProductFromRoutine } from '../services/storageService';
 import { INITIAL_PRODUCTS, NIGHT_COLORS } from '../constants';
@@ -8,6 +9,7 @@ const ProductsView: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState<string>('Tutti');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   
   // New Product Form State
   const [newName, setNewName] = useState('');
@@ -16,6 +18,8 @@ const ProductsView: React.FC = () => {
   const [newUsedIn, setNewUsedIn] = useState<string[]>([]);
   const [newCycleNights, setNewCycleNights] = useState<number[]>([]); // Track specific nights 1,2,3,4
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newUsageAdvice, setNewUsageAdvice] = useState('');
 
   useEffect(() => {
     setProducts(getProducts());
@@ -40,7 +44,9 @@ const ProductsView: React.FC = () => {
       usedIn: newUsedIn as ('AM' | 'PM')[],
       cycleNights: newUsedIn.includes('PM') ? newCycleNights : [],
       isIrritant: newCategory === 'Esfoliante' || newCategory === 'Retinoide',
-      imageUrl: newImageUrl
+      imageUrl: newImageUrl,
+      description: newDescription,
+      usageAdvice: newUsageAdvice
     };
     
     setProducts(prev => {
@@ -52,7 +58,7 @@ const ProductsView: React.FC = () => {
     addProductToRoutine(newProduct);
 
     setIsFormOpen(false);
-    setNewName(''); setNewBrand(''); setNewUsedIn([]); setNewCycleNights([]); setNewImageUrl('');
+    setNewName(''); setNewBrand(''); setNewUsedIn([]); setNewCycleNights([]); setNewImageUrl(''); setNewDescription(''); setNewUsageAdvice('');
   };
 
   const handleDeleteProduct = (id: string, e: React.MouseEvent) => {
@@ -100,7 +106,7 @@ const ProductsView: React.FC = () => {
     <div className="pb-24 pt-6 px-4 max-w-md mx-auto h-screen overflow-y-auto no-scrollbar relative">
       
       <div className="flex justify-between items-end mb-6 pl-2 drop-shadow-sm">
-        <h1 className="text-2xl font-nunito font-bold text-stone-900">Shelfie</h1>
+        <h1 className="text-2xl font-nunito font-bold text-stone-900">Dossier Prodotti</h1>
         <button 
             onClick={() => setIsFormOpen(true)}
             className="w-10 h-10 bg-stone-800 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform"
@@ -124,46 +130,109 @@ const ProductsView: React.FC = () => {
           ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-4">
           {filteredProducts.map(rawProduct => {
               const product = getDisplayProduct(rawProduct);
-              return (
-                <div key={product.id} className="relative group bg-white/30 backdrop-blur-md rounded-2xl p-3 pb-4 shadow-lg border border-white/30 flex flex-col h-full hover:bg-white/50 transition-all">
-                    
-                    <button 
-                        onClick={(e) => handleDeleteProduct(product.id, e)}
-                        className="absolute -top-2 -right-2 z-20 w-10 h-10 flex items-center justify-center"
-                    >
-                        <div className="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-stone-400 shadow-md border border-stone-100 hover:text-red-500 hover:scale-110 transition-all">
-                            <Trash2 size={12} />
-                        </div>
-                    </button>
+              const isExpanded = expandedId === product.id;
 
-                    <div className={`h-32 rounded-xl mb-3 overflow-hidden flex items-center justify-center bg-white/30 border border-white/30`}>
-                        {product.imageUrl ? (
-                           <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                        ) : (
-                           <span className="text-4xl font-serif text-stone-400 opacity-50">{product.name.charAt(0)}</span>
-                        )}
+              return (
+                <div 
+                    key={product.id} 
+                    className={`relative bg-white/30 backdrop-blur-md rounded-[1.5rem] p-4 shadow-lg border border-white/30 transition-all duration-300 ${isExpanded ? 'ring-2 ring-rose-200 bg-white/50' : 'hover:bg-white/40'}`}
+                    onClick={() => setExpandedId(isExpanded ? null : product.id)}
+                >
+                    <div className="flex gap-4">
+                        <div className={`w-20 h-20 rounded-xl overflow-hidden flex items-center justify-center bg-white/50 border border-white/40 shrink-0`}>
+                            {product.imageUrl ? (
+                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                            ) : (
+                            <span className="text-2xl font-serif text-stone-400 opacity-50">{product.name.charAt(0)}</span>
+                            )}
+                        </div>
+                        
+                        <div className="flex flex-col flex-1 min-w-0">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-[10px] text-stone-600 font-bold uppercase tracking-wider mb-0.5">{product.brand || 'No Brand'}</p>
+                                    <h4 className="font-nunito font-bold text-base text-stone-900 leading-tight mb-1 pr-6">{product.name}</h4>
+                                </div>
+                                <button 
+                                    onClick={(e) => handleDeleteProduct(product.id, e)}
+                                    className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
+
+                            <div className="flex flex-wrap gap-1 mt-auto">
+                                {product.category && (
+                                    <span className="px-2 py-0.5 rounded-md bg-stone-100/50 text-[10px] font-bold text-stone-600 border border-stone-200/50">
+                                        {product.category}
+                                    </span>
+                                )}
+                                {product.usedIn.includes('AM') && <span className="w-5 h-5 rounded-full bg-amber-100/60 flex items-center justify-center"><Sun size={10} className="text-amber-600"/></span>}
+                                {product.usedIn.includes('PM') && <span className="w-5 h-5 rounded-full bg-indigo-100/60 flex items-center justify-center"><Moon size={10} className="text-indigo-600"/></span>}
+                                {product.isIrritant && <span className="w-5 h-5 rounded-full bg-rose-100/60 flex items-center justify-center"><AlertTriangle size={10} className="text-rose-500"/></span>}
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Expanded Technical Sheet */}
+                    {isExpanded && (
+                        <div className="mt-4 pt-4 border-t border-stone-200/30 space-y-3 animate-fade-in">
+                            
+                            {(product.description || product.notes) && (
+                                <div className="bg-white/40 p-3 rounded-xl border border-white/40">
+                                    <div className="flex items-center gap-2 mb-1 text-stone-800">
+                                        <FileText size={14} className="text-rose-500" />
+                                        <h5 className="text-xs font-bold uppercase tracking-wider">Dati Tecnici & Funzione</h5>
+                                    </div>
+                                    <p className="text-xs text-stone-700 leading-relaxed font-medium">
+                                        {product.description || product.notes}
+                                    </p>
+                                </div>
+                            )}
+
+                            {product.usageAdvice && (
+                                <div className="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100/50">
+                                    <div className="flex items-center gap-2 mb-1 text-emerald-800">
+                                        <Zap size={14} className="text-emerald-500" />
+                                        <h5 className="text-xs font-bold uppercase tracking-wider">Consigli Applicazione</h5>
+                                    </div>
+                                    <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+                                        {product.usageAdvice}
+                                    </p>
+                                </div>
+                            )}
+
+                            {product.usedIn.includes('PM') && product.cycleNights && product.cycleNights.length > 0 && (
+                                <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-[10px] font-bold text-stone-500 uppercase">Notti Ciclo:</span>
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4].map(n => {
+                                            const isActive = product.cycleNights?.includes(n);
+                                            const color = getNightColor(n);
+                                            return isActive ? (
+                                                <div 
+                                                    key={n} 
+                                                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm"
+                                                    style={{ backgroundColor: color }}
+                                                >
+                                                    {n}
+                                                </div>
+                                            ) : null;
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     
-                    <div className="flex flex-col flex-1">
-                      <h4 className="font-nunito font-bold text-sm text-stone-800 leading-tight mb-1 line-clamp-2 pr-4">{product.name}</h4>
-                      <p className="text-[10px] text-stone-600 font-medium uppercase tracking-wider mb-3">{product.brand || 'No Brand'}</p>
-                      
-                      <div className="mt-auto flex flex-wrap gap-1">
-                          {product.usedIn.includes('AM') && <span className="w-5 h-5 rounded-full bg-amber-100/60 flex items-center justify-center"><Sun size={10} className="text-amber-600"/></span>}
-                          {product.usedIn.includes('PM') && <span className="w-5 h-5 rounded-full bg-indigo-100/60 flex items-center justify-center"><Moon size={10} className="text-indigo-600"/></span>}
-                          {product.isIrritant && <span className="w-5 h-5 rounded-full bg-rose-100/60 flex items-center justify-center"><AlertTriangle size={10} className="text-rose-500"/></span>}
-                          
-                          {/* Mini badges */}
-                          {product.usedIn.includes('PM') && product.cycleNights && product.cycleNights.length > 0 && product.cycleNights.length < 4 && (
-                              <span className="h-5 px-1.5 rounded-full bg-stone-100/60 flex items-center justify-center text-[8px] font-bold text-stone-600">
-                                  {product.cycleNights.join(',')}
-                              </span>
-                          )}
-                      </div>
-                    </div>
+                    {!isExpanded && (product.description || product.usageAdvice) && (
+                        <div className="absolute bottom-4 right-4 animate-pulse">
+                            <Info size={16} className="text-rose-400" />
+                        </div>
+                    )}
                 </div>
               );
           })}
@@ -193,6 +262,10 @@ const ProductsView: React.FC = () => {
                             ))}
                         </select>
                     </div>
+
+                    <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} className="w-full bg-white/40 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 ring-rose-200 border border-white/40 placeholder-stone-400 min-h-[80px]" placeholder="Dati Tecnici e Funzione" />
+                    
+                    <textarea value={newUsageAdvice} onChange={e => setNewUsageAdvice(e.target.value)} className="w-full bg-white/40 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 ring-rose-200 border border-white/40 placeholder-stone-400 min-h-[60px]" placeholder="Consigli di Applicazione" />
 
                     <input value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="w-full bg-white/40 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 ring-rose-200 border border-white/40 placeholder-stone-400" placeholder="URL Immagine (opzionale)" />
                     

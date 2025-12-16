@@ -1,3 +1,4 @@
+
 export type RoutineType = 'AM' | 'PM';
 
 export type ProductType = 'Detergente' | 'Siero' | 'Crema' | 'Esfoliante' | 'Retinoide' | 'SPF' | 'Trattamento';
@@ -9,7 +10,9 @@ export interface Product {
   category: ProductType;
   usedIn: RoutineType[];
   cycleNights?: number[]; // 1, 2, 3, 4 (relevant for PM)
-  notes?: string;
+  notes?: string; // Brevi note
+  description?: string; // Dati Tecnici e Funzione
+  usageAdvice?: string; // Consigli di Applicazione
   isIrritant?: boolean;
   imageUrl?: string;
 }
