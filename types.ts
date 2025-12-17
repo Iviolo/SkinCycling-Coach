@@ -15,7 +15,11 @@ export interface Product {
   usageAdvice?: string; // Consigli di Applicazione
   isIrritant?: boolean;
   imageUrl?: string;
+  dateOpened?: string; // ISO String YYYY-MM-DD
+  pao?: number; // Period After Opening in months
 }
+
+export type SkinCondition = 'Normale' | 'Secca' | 'Sensibile' | 'Irritata' | 'Breakout';
 
 export interface DailyLog {
   date: string; // ISO date string YYYY-MM-DD
@@ -23,6 +27,7 @@ export interface DailyLog {
   pmCompleted: boolean;
   notes: string;
   cycleDay: number; // 1-based index of the active cycle
+  skinCondition?: SkinCondition;
 }
 
 export interface AppState {
@@ -52,3 +57,4 @@ export interface RoutineSettings {
   amRoutine: RoutineStep[];
   pmCycle: CycleNightConfig[];
 }
+
