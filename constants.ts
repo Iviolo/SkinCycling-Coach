@@ -181,4 +181,3 @@ export const DEFAULT_ROUTINE_SETTINGS: RoutineSettings = {
     }
   ]
 };
-

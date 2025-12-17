@@ -57,4 +57,3 @@ export interface RoutineSettings {
   amRoutine: RoutineStep[];
   pmCycle: CycleNightConfig[];
 }
-

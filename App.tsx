@@ -31,7 +31,8 @@ const App: React.FC = () => {
 
   return (
     <>
-feat: Update App.tsx with background styling and UI improvements          Fixed position ensures it never scrolls. 
+      {/* GLOBAL BACKGROUND 
+          Fixed position ensures it never scrolls. 
           z-index -1 ensures it stays behind all content.
       */}
       <div 
