@@ -23,8 +23,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
-        # Se non hai un package-lock.json committato, usa: npm install
+npm install        # Se non hai un package-lock.json committato, usa: npm install
 
       - name: Build
         run: npm run build
