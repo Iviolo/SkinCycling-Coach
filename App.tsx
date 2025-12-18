@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import TodayView from './views/TodayView';
@@ -5,6 +6,7 @@ import CalendarView from './views/CalendarView';
 import ProductsView from './views/ProductsView';
 import InfoView from './views/InfoView';
 import SettingsView from './views/SettingsView';
+import ChatView from './views/ChatView';
 
 const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('today');
@@ -20,6 +22,8 @@ const App: React.FC = () => {
         return <TodayView onOpenSettings={handleOpenSettings} />;
       case 'calendar':
         return <CalendarView />;
+      case 'chat':
+        return <ChatView />;
       case 'products':
         return <ProductsView />;
       case 'info':
@@ -50,7 +54,7 @@ const App: React.FC = () => {
           <SettingsView onBack={handleCloseSettings} />
         ) : (
           <>
-            <main className="h-full pb-20">
+            <main className="h-full pb-20 overflow-x-hidden">
               {renderView()}
             </main>
             <Navbar currentTab={currentTab} setTab={setCurrentTab} />
